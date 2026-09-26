@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import GlassBackground from '../components/GlassBackground';
+import GlassCard from '../components/GlassCard';
+import GlassField from '../components/GlassField';
+import GlassButton from '../components/GlassButton';
+import { colors } from '../theme/glass';
 
 function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -11,72 +16,64 @@ function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Wildlife Ranger</Text>
-      <Text style={styles.subtitle}>Ranger Login</Text>
+    <GlassBackground>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <GlassCard>
+          <Text style={styles.eyebrow}>Conservation Platform</Text>
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>Sign in to continue your ranger duties.</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+          <View>
+            <GlassField
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="you@example.com"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+            <GlassField
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••••"
+              secureTextEntry
+              autoComplete="password"
+            />
+          </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-    </View>
+          <GlassButton onPress={handleLogin} style={styles.button}>
+            Sign In
+          </GlassButton>
+        </GlassCard>
+      </KeyboardAvoidingView>
+    </GlassBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#14532d',
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    color: colors.eyebrow,
+    marginBottom: 10,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#fff',
+    color: colors.white,
     marginBottom: 4,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#d1fae5',
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 12,
-    fontSize: 16,
+    color: colors.whiteMuted,
+    marginBottom: 24,
   },
   button: {
-    backgroundColor: '#facc15',
-    borderRadius: 8,
-    paddingVertical: 16,
-    marginTop: 12,
-  },
-  buttonText: {
-    textAlign: 'center',
-    fontWeight: '700',
-    fontSize: 16,
-    color: '#14532d',
+    marginTop: 8,
   },
 });
 
