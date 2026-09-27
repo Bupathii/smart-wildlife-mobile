@@ -14,11 +14,15 @@ import {
   useAuth,
 } from "@/context/AuthContext";
 
-const ACTIVE_COLOR = "#0F766E";
-const INACTIVE_COLOR = "#64748B";
+const ACTIVE_COLOR =
+  "#0F766E";
+
+const INACTIVE_COLOR =
+  "#64748B";
 
 export default function CommunityLayout() {
-  const { user } = useAuth();
+  const { user } =
+    useAuth();
 
   if (!user) {
     return (
@@ -30,7 +34,9 @@ export default function CommunityLayout() {
     user.role !==
     "COMMUNITY_MEMBER"
   ) {
-    return <Redirect href="/" />;
+    return (
+      <Redirect href="/" />
+    );
   }
 
   return (
@@ -96,7 +102,6 @@ export default function CommunityLayout() {
         options={{
           title: "Report",
 
-          // Nested stack has its own header.
           headerShown: false,
 
           tabBarIcon: ({
@@ -115,10 +120,10 @@ export default function CommunityLayout() {
       <Tabs.Screen
         name="reports"
         options={{
-          title: "My Reports",
-
-          headerTitle:
+          title:
             "My Reports",
+
+          headerShown: false,
 
           tabBarIcon: ({
             color,
