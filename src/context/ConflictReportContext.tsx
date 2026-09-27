@@ -34,17 +34,28 @@ interface ConflictReportContextType {
   resetDraft: () => void;
 }
 
-const initialDraft: ConflictReportDraft = {
-  conflictType: null,
+function createClientReportId() {
+  return `mobile-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+}
 
-  description: "",
+function createInitialDraft(): ConflictReportDraft {
+  return {
+    clientReportId:
+      createClientReportId(),
 
-  location: {
-    source: null,
-  },
+    conflictType: null,
 
-  evidence: [],
-};
+    description: "",
+
+    location: {
+      source: null,
+    },
+
+    evidence: [],
+  };
+}
 
 const ConflictReportContext =
   createContext<
@@ -58,7 +69,7 @@ export function ConflictReportProvider({
 }) {
   const [draft, setDraft] =
     useState<ConflictReportDraft>(
-      initialDraft
+      createInitialDraft
     );
 
   function setConflictType(
@@ -98,16 +109,9 @@ export function ConflictReportProvider({
   }
 
   function resetDraft() {
-    setDraft({
-      conflictType: null,
-      description: "",
-
-      location: {
-        source: null,
-      },
-
-      evidence: [],
-    });
+    setDraft(
+      createInitialDraft()
+    );
   }
 
   return (
