@@ -1,42 +1,49 @@
 import {
-    Alert,
-    Image,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from "react-native";
 
 import {
-    CheckCircle2,
-    FileText,
-    ImageIcon,
-    LoaderCircle,
-    MapPin,
-    Pencil,
-    ShieldCheck,
-    TriangleAlert,
+  CheckCircle2,
+  FileText,
+  ImageIcon,
+  LoaderCircle,
+  MapPin,
+  Pencil,
+  ShieldCheck,
+  TriangleAlert,
 } from "lucide-react-native";
 
 import {
-    router,
+  router,
 } from "expo-router";
 
 import {
-    useState,
+  useState,
 } from "react";
 
+import NetInfo from "@react-native-community/netinfo";
+
 import {
-    useAuth,
+  useAuth,
 } from "@/context/AuthContext";
 
 import {
-    useConflictReport,
+  useConflictReport,
 } from "@/context/ConflictReportContext";
 
 import {
-    submitConflictReport,
+  ConflictApiError,
+  submitConflictReport,
 } from "@/services/conflict.service";
+
+import {
+  savePendingConflictReport,
+} from "@/services/pendingConflict.service";
 
 function getConflictTypeLabel(
   type: string | null
@@ -70,6 +77,33 @@ export default function ReviewScreen() {
     setSubmitting,
   ] = useState(false);
 
+  /*
+   * ===================================================
+   * SAVE REPORT LOCALLY AND OPEN OFFLINE SUCCESS SCREEN
+   * ===================================================
+   */
+  async function saveOfflineReport() {
+    await savePendingConflictReport(
+      draft
+    );
+
+    resetDraft();
+
+    router.replace({
+      pathname:
+        "/community/report/success",
+
+      params: {
+        offline: "true",
+      },
+    });
+  }
+
+  /*
+   * ===================================================
+   * SUBMIT REPORT
+   * ===================================================
+   */
   async function handleSubmit() {
     if (!token) {
       Alert.alert(
@@ -96,37 +130,137 @@ export default function ReviewScreen() {
     try {
       setSubmitting(true);
 
-      const result =
-        await submitConflictReport(
-          draft,
-          token
-        );
+      /*
+       * Check current connection before
+       * starting upload.
+       */
+      const network =
+        await NetInfo.fetch();
 
-      const reportId =
-        result.report?._id ||
-        "";
+      const isOnline =
+        network.isConnected ===
+          true &&
+        network
+          .isInternetReachable !==
+          false;
 
-      const duplicate =
-        result.potentialDuplicate
-          ? "true"
-          : "false";
+      /*
+       * No internet:
+       * save report locally immediately.
+       */
+      if (!isOnline) {
+        await saveOfflineReport();
 
-      resetDraft();
+        return;
+      }
 
-      router.replace({
-        pathname:
-          "/community/report/success",
+      /*
+       * Internet available:
+       * try normal API submission.
+       */
+      try {
+        const result =
+          await submitConflictReport(
+            draft,
+            token
+          );
 
-        params: {
-          reportId,
-          duplicate,
-        },
-      });
+        const reportId =
+          result.report?._id ||
+          "";
+
+        const duplicate =
+          result.potentialDuplicate
+            ? "true"
+            : "false";
+
+        resetDraft();
+
+        router.replace({
+          pathname:
+            "/community/report/success",
+
+          params: {
+            reportId,
+            duplicate,
+            offline:
+              "false",
+          },
+        });
+      } catch (error: any) {
+        /*
+         * API errors such as:
+         * validation,
+         * unauthorized,
+         * forbidden,
+         * server response errors
+         *
+         * should NOT automatically
+         * become offline reports.
+         */
+        if (
+          error instanceof
+          ConflictApiError
+        ) {
+          throw error;
+        }
+
+        /*
+         * A transport/network failure may
+         * happen during file upload.
+         *
+         * Re-check the network.
+         */
+        const latestNetwork =
+          await NetInfo.fetch();
+
+        const connectionLost =
+          latestNetwork
+            .isConnected ===
+            false ||
+          latestNetwork
+            .isInternetReachable ===
+            false;
+
+        const message =
+          String(
+            error?.message ||
+              ""
+          ).toLowerCase();
+
+        const looksLikeNetworkError =
+          error instanceof
+            TypeError ||
+          message.includes(
+            "network"
+          ) ||
+          message.includes(
+            "fetch"
+          ) ||
+          message.includes(
+            "connection"
+          );
+
+        /*
+         * If internet disappeared during
+         * submission, save locally.
+         */
+        if (
+          connectionLost ||
+          looksLikeNetworkError
+        ) {
+          await saveOfflineReport();
+
+          return;
+        }
+
+        throw error;
+      }
     } catch (error: any) {
       Alert.alert(
         "Submission Failed",
         error?.message ||
-          "Unable to submit the report. Please try again."
+          "Unable to submit or save the report. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -286,7 +420,8 @@ export default function ReviewScreen() {
                         uri:
                           item.uri,
                       }}
-                      className="h-24 w-24 rounded-xl"
+                      className="h-24 w-24 rounded-xl bg-slate-100"
+                      resizeMode="cover"
                     />
                   )
                 )}
@@ -297,14 +432,14 @@ export default function ReviewScreen() {
           {draft.evidence.length ===
             0 && (
             <Text className="mt-3 text-xs text-slate-400">
-              No evidence was
-              attached. This is
+              No evidence was attached.
+              Supporting evidence is
               optional.
             </Text>
           )}
         </View>
 
-        {/* Submission notice */}
+        {/* Information */}
 
         <View className="mt-5 flex-row rounded-2xl border border-teal-100 bg-teal-50 p-4">
           <ShieldCheck
@@ -313,14 +448,19 @@ export default function ReviewScreen() {
           />
 
           <Text className="ml-3 flex-1 text-xs leading-5 text-teal-800">
-            After submission, the
-            report will be available
-            to authorized wildlife
-            personnel for review and
-            response.
+            When online, your report
+            will be sent immediately to
+            authorized wildlife
+            personnel. If internet
+            access is unavailable, it
+            will be saved on this device
+            and synchronized when the
+            connection returns.
           </Text>
         </View>
       </ScrollView>
+
+      {/* Bottom Submit Button */}
 
       <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4">
         <Pressable
@@ -344,7 +484,7 @@ export default function ReviewScreen() {
               />
 
               <Text className="ml-2 text-base font-bold text-white">
-                Submitting...
+                Processing...
               </Text>
             </>
           ) : (
@@ -365,6 +505,11 @@ export default function ReviewScreen() {
   );
 }
 
+/*
+ * =====================================================
+ * REVIEW CARD
+ * =====================================================
+ */
 function ReviewCard({
   icon: Icon,
   iconColor,

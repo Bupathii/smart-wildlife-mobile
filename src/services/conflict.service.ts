@@ -10,6 +10,23 @@ import {
   UrgencyLevel,
 } from "@/types/conflict";
 
+export class ConflictApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(
+    message: string,
+    status: number,
+    data?: any
+  ) {
+    super(message);
+
+    this.name = "ConflictApiError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
 interface SubmitConflictResponse {
   success: boolean;
   message: string;
@@ -58,8 +75,21 @@ interface UpdateConflictResponse {
   report: ConflictReport;
 }
 
+async function readResponse(
+  response: any
+) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 /*
- * SUBMIT COMMUNITY REPORT
+ * =====================================================
+ * SUBMIT COMMUNITY CONFLICT REPORT
+ * POST /api/conflicts
+ * =====================================================
  */
 export async function submitConflictReport(
   draft: ConflictReportDraft,
@@ -112,10 +142,19 @@ export async function submitConflictReport(
     );
   }
 
+  /*
+   * Multiple optional evidence images.
+   */
   for (const evidence of draft.evidence) {
     const file = new File(
       evidence.uri
     );
+
+    if (!file.exists) {
+      throw new Error(
+        `Evidence file "${evidence.fileName}" is not available`
+      );
+    }
 
     formData.append(
       "evidence",
@@ -138,12 +177,14 @@ export async function submitConflictReport(
   );
 
   const data: any =
-    await response.json();
+    await readResponse(response);
 
   if (!response.ok) {
-    throw new Error(
+    throw new ConflictApiError(
       data?.message ||
-        "Unable to submit report"
+        "Unable to submit report",
+      response.status,
+      data
     );
   }
 
@@ -151,7 +192,10 @@ export async function submitConflictReport(
 }
 
 /*
+ * =====================================================
  * COMMUNITY MEMBER - MY REPORTS
+ * GET /api/conflicts/my
+ * =====================================================
  */
 export async function getMyConflictReports(
   token: string,
@@ -161,14 +205,17 @@ export async function getMyConflictReports(
     `${API_BASE_URL}/conflicts/my`;
 
   if (status) {
-    url += `?status=${encodeURIComponent(
-      status
-    )}`;
+    url +=
+      `?status=${encodeURIComponent(
+        status
+      )}`;
   }
 
   const response = await fetch(
     url,
     {
+      method: "GET",
+
       headers: {
         Authorization:
           `Bearer ${token}`,
@@ -177,12 +224,14 @@ export async function getMyConflictReports(
   );
 
   const data: any =
-    await response.json();
+    await readResponse(response);
 
   if (!response.ok) {
-    throw new Error(
+    throw new ConflictApiError(
       data?.message ||
-        "Unable to load reports"
+        "Unable to load reports",
+      response.status,
+      data
     );
   }
 
@@ -190,10 +239,10 @@ export async function getMyConflictReports(
 }
 
 /*
- * GET ONE REPORT
- *
- * Works for Community Member,
- * Ranger and CLO according to backend permissions.
+ * =====================================================
+ * GET SINGLE CONFLICT REPORT
+ * GET /api/conflicts/:id
+ * =====================================================
  */
 export async function getConflictReportById(
   reportId: string,
@@ -202,6 +251,8 @@ export async function getConflictReportById(
   const response = await fetch(
     `${API_BASE_URL}/conflicts/${reportId}`,
     {
+      method: "GET",
+
       headers: {
         Authorization:
           `Bearer ${token}`,
@@ -210,12 +261,14 @@ export async function getConflictReportById(
   );
 
   const data: any =
-    await response.json();
+    await readResponse(response);
 
   if (!response.ok) {
-    throw new Error(
+    throw new ConflictApiError(
       data?.message ||
-        "Unable to load report"
+        "Unable to load report",
+      response.status,
+      data
     );
   }
 
@@ -223,7 +276,10 @@ export async function getConflictReportById(
 }
 
 /*
- * STAFF - ALL COMMUNITY CONFLICT REPORTS
+ * =====================================================
+ * STAFF - GET ALL CONFLICT REPORTS
+ * GET /api/conflicts
+ * =====================================================
  */
 export async function getStaffConflictReports(
   token: string,
@@ -247,6 +303,8 @@ export async function getStaffConflictReports(
       "&"
     )}`,
     {
+      method: "GET",
+
       headers: {
         Authorization:
           `Bearer ${token}`,
@@ -255,12 +313,14 @@ export async function getStaffConflictReports(
   );
 
   const data: any =
-    await response.json();
+    await readResponse(response);
 
   if (!response.ok) {
-    throw new Error(
+    throw new ConflictApiError(
       data?.message ||
-        "Unable to load conflict reports"
+        "Unable to load conflict reports",
+      response.status,
+      data
     );
   }
 
@@ -268,7 +328,10 @@ export async function getStaffConflictReports(
 }
 
 /*
+ * =====================================================
  * RANGER / CLO - UPDATE RESPONSE
+ * PATCH /api/conflicts/:id/response
+ * =====================================================
  */
 export async function updateConflictResponse(
   reportId: string,
@@ -295,12 +358,14 @@ export async function updateConflictResponse(
   );
 
   const data: any =
-    await response.json();
+    await readResponse(response);
 
   if (!response.ok) {
-    throw new Error(
+    throw new ConflictApiError(
       data?.message ||
-        "Unable to update report"
+        "Unable to update report",
+      response.status,
+      data
     );
   }
 

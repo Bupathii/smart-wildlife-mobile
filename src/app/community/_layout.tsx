@@ -14,15 +14,17 @@ import {
   useAuth,
 } from "@/context/AuthContext";
 
-const ACTIVE_COLOR =
-  "#0F766E";
+import {
+  usePendingConflictSync,
+} from "@/hooks/usePendingConflictSync";
 
-const INACTIVE_COLOR =
-  "#64748B";
+const ACTIVE_COLOR = "#0F766E";
+const INACTIVE_COLOR = "#64748B";
 
 export default function CommunityLayout() {
-  const { user } =
-    useAuth();
+  const { user } = useAuth();
+
+  usePendingConflictSync();
 
   if (!user) {
     return (
@@ -52,6 +54,7 @@ export default function CommunityLayout() {
 
         headerTitleStyle: {
           fontWeight: "700",
+          fontSize: 18,
         },
 
         tabBarActiveTintColor:
@@ -68,6 +71,7 @@ export default function CommunityLayout() {
             "#FFFFFF",
           borderTopColor:
             "#E2E8F0",
+          borderTopWidth: 1,
         },
 
         tabBarLabelStyle: {
@@ -104,6 +108,8 @@ export default function CommunityLayout() {
 
           headerShown: false,
 
+          popToTopOnBlur: true,
+
           tabBarIcon: ({
             color,
             size,
@@ -120,10 +126,11 @@ export default function CommunityLayout() {
       <Tabs.Screen
         name="reports"
         options={{
-          title:
-            "My Reports",
+          title: "My Reports",
 
           headerShown: false,
+
+          popToTopOnBlur: true,
 
           tabBarIcon: ({
             color,
