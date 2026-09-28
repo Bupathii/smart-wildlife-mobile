@@ -1,10 +1,11 @@
 import { Redirect, Tabs } from "expo-router";
 import {
   BellRing,
+  ClipboardList,
   FileWarning,
   House,
   Map,
-  UserRound,
+  UserRound
 } from "lucide-react-native";
 
 import { useAuth } from "@/context/AuthContext";
@@ -56,7 +57,7 @@ export default function RangerLayout() {
         },
 
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 9,
           fontWeight: "600",
           marginTop: 2,
         },
@@ -110,6 +111,25 @@ export default function RangerLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+  name="conflicts"
+  options={{
+    title: "Conflicts",
+
+    headerShown: false,
+
+    tabBarIcon: ({
+      color,
+      size,
+    }) => (
+      <ClipboardList
+        color={color}
+        size={size}
+        strokeWidth={2.2}
+      />
+    ),
+  }}
+/>
 
       <Tabs.Screen
         name="alerts"

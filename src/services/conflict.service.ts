@@ -1,14 +1,13 @@
 import { File } from "expo-file-system";
 import { fetch } from "expo/fetch";
 
-import {
-    API_BASE_URL,
-} from "@/services/api";
+import { API_BASE_URL } from "@/services/api";
 
 import {
-    ConflictReport,
-    ConflictReportDraft,
-    ConflictStatus,
+  ConflictReport,
+  ConflictReportDraft,
+  ConflictStatus,
+  UrgencyLevel,
 } from "@/types/conflict";
 
 interface SubmitConflictResponse {
@@ -29,18 +28,44 @@ interface SingleReportResponse {
   report: ConflictReport;
 }
 
+interface StaffReportsResponse {
+  success: boolean;
+
+  pagination: {
+    page: number;
+    limit: number;
+    totalReports: number;
+    totalPages: number;
+  };
+
+  reports: ConflictReport[];
+}
+
+interface UpdateResponsePayload {
+  status?: Exclude<
+    ConflictStatus,
+    "SUBMITTED"
+  >;
+
+  urgencyLevel?: UrgencyLevel;
+
+  responseNote?: string;
+}
+
+interface UpdateConflictResponse {
+  success: boolean;
+  message: string;
+  report: ConflictReport;
+}
+
 /*
- * =====================================================
- * SUBMIT CONFLICT REPORT
- * POST /api/conflicts
- * =====================================================
+ * SUBMIT COMMUNITY REPORT
  */
 export async function submitConflictReport(
   draft: ConflictReportDraft,
   token: string
 ): Promise<SubmitConflictResponse> {
-  const formData =
-    new FormData();
+  const formData = new FormData();
 
   formData.append(
     "clientReportId",
@@ -63,47 +88,34 @@ export async function submitConflictReport(
   );
 
   if (
-    draft.location.latitude !==
-    undefined
+    draft.location.latitude !== undefined
   ) {
     formData.append(
       "latitude",
-      String(
-        draft.location.latitude
-      )
+      String(draft.location.latitude)
     );
   }
 
   if (
-    draft.location.longitude !==
-    undefined
+    draft.location.longitude !== undefined
   ) {
     formData.append(
       "longitude",
-      String(
-        draft.location.longitude
-      )
+      String(draft.location.longitude)
     );
   }
 
-  if (
-    draft.location.manualLocation
-  ) {
+  if (draft.location.manualLocation) {
     formData.append(
       "manualLocation",
       draft.location.manualLocation
     );
   }
 
-  /*
-   * Multiple Evidence
-   * 0 - 5 images
-   */
   for (const evidence of draft.evidence) {
-    const file =
-      new File(
-        evidence.uri
-      );
+    const file = new File(
+      evidence.uri
+    );
 
     formData.append(
       "evidence",
@@ -111,31 +123,22 @@ export async function submitConflictReport(
     );
   }
 
-  const response =
-    await fetch(
-      `${API_BASE_URL}/conflicts`,
-      {
-        method: "POST",
+  const response = await fetch(
+    `${API_BASE_URL}/conflicts`,
+    {
+      method: "POST",
 
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-        },
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
 
-        body: formData,
-      }
-    );
+      body: formData,
+    }
+  );
 
-  let data: any;
-
-  try {
-    data =
-      await response.json();
-  } catch {
-    throw new Error(
-      "Invalid response from server"
-    );
-  }
+  const data: any =
+    await response.json();
 
   if (!response.ok) {
     throw new Error(
@@ -148,10 +151,7 @@ export async function submitConflictReport(
 }
 
 /*
- * =====================================================
- * MY REPORTS
- * GET /api/conflicts/my
- * =====================================================
+ * COMMUNITY MEMBER - MY REPORTS
  */
 export async function getMyConflictReports(
   token: string,
@@ -161,32 +161,23 @@ export async function getMyConflictReports(
     `${API_BASE_URL}/conflicts/my`;
 
   if (status) {
-    url +=
-      `?status=${encodeURIComponent(
-        status
-      )}`;
+    url += `?status=${encodeURIComponent(
+      status
+    )}`;
   }
 
-  const response =
-    await fetch(url, {
-      method: "GET",
-
+  const response = await fetch(
+    url,
+    {
       headers: {
         Authorization:
           `Bearer ${token}`,
       },
-    });
+    }
+  );
 
-  let data: any;
-
-  try {
-    data =
-      await response.json();
-  } catch {
-    throw new Error(
-      "Invalid response from server"
-    );
-  }
+  const data: any =
+    await response.json();
 
   if (!response.ok) {
     throw new Error(
@@ -199,43 +190,117 @@ export async function getMyConflictReports(
 }
 
 /*
- * =====================================================
- * GET SINGLE REPORT
- * GET /api/conflicts/:id
- * =====================================================
+ * GET ONE REPORT
+ *
+ * Works for Community Member,
+ * Ranger and CLO according to backend permissions.
  */
 export async function getConflictReportById(
   reportId: string,
   token: string
 ): Promise<SingleReportResponse> {
-  const response =
-    await fetch(
-      `${API_BASE_URL}/conflicts/${reportId}`,
-      {
-        method: "GET",
+  const response = await fetch(
+    `${API_BASE_URL}/conflicts/${reportId}`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+    }
+  );
 
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-        },
-      }
-    );
-
-  let data: any;
-
-  try {
-    data =
-      await response.json();
-  } catch {
-    throw new Error(
-      "Invalid response from server"
-    );
-  }
+  const data: any =
+    await response.json();
 
   if (!response.ok) {
     throw new Error(
       data?.message ||
         "Unable to load report"
+    );
+  }
+
+  return data;
+}
+
+/*
+ * STAFF - ALL COMMUNITY CONFLICT REPORTS
+ */
+export async function getStaffConflictReports(
+  token: string,
+  status?: ConflictStatus
+): Promise<StaffReportsResponse> {
+  const params: string[] = [
+    "page=1",
+    "limit=50",
+  ];
+
+  if (status) {
+    params.push(
+      `status=${encodeURIComponent(
+        status
+      )}`
+    );
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/conflicts?${params.join(
+      "&"
+    )}`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data: any =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ||
+        "Unable to load conflict reports"
+    );
+  }
+
+  return data;
+}
+
+/*
+ * RANGER / CLO - UPDATE RESPONSE
+ */
+export async function updateConflictResponse(
+  reportId: string,
+  token: string,
+  payload: UpdateResponsePayload
+): Promise<UpdateConflictResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/conflicts/${reportId}/response`,
+    {
+      method: "PATCH",
+
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+
+        "Content-Type":
+          "application/json",
+      },
+
+      body: JSON.stringify(
+        payload
+      ),
+    }
+  );
+
+  const data: any =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ||
+        "Unable to update report"
     );
   }
 
