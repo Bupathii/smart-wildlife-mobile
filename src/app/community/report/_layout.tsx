@@ -1,9 +1,9 @@
 import {
-    Stack,
+  Stack,
 } from "expo-router";
 
 import {
-    ConflictReportProvider,
+  ConflictReportProvider,
 } from "@/context/ConflictReportContext";
 
 export default function ReportLayout() {
