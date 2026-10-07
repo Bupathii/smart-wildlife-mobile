@@ -1,56 +1,65 @@
-# Welcome to your Expo app 👋
+# Mobile — Smart Wildlife Conservation App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo Router + React Native (TypeScript) app for the two field-facing roles that don't use the [web dashboard](../../frontend/smart-wildlife-frontend): `COMMUNITY_MEMBER` (reports human–wildlife conflicts) and `RANGER` / `COMMUNITY_LIAISON_OFFICER` (respond to those reports). See `AGENTS.md`/`CLAUDE.md` for Expo-version-specific coding rules — this file covers what the app actually does.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Setup
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+No `.env` file exists yet. The API base URL comes from `EXPO_PUBLIC_API_URL` (`src/services/api.ts`), falling back to:
+- `http://10.0.2.2:5000/api` on Android (emulator's alias for the host machine)
+- `http://localhost:5000/api` on iOS
 
-### Other setup steps
+**On a physical device via Expo Go, neither fallback works** — create a `.env` with your machine's LAN IP:
+```
+EXPO_PUBLIC_API_URL=http://<your-LAN-IP>:5000/api
+```
+and make sure the [backend](../../backend/smart-wildlife-backend)'s `CORS_ORIGIN` allows it. If Expo Go can't reach the dev server at all (`IOException: Failed to download remote update`), check that the phone and computer are on the same network and no VPN/virtual adapter is being advertised instead of the real LAN IP — `npx expo start --tunnel` sidesteps this.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Stack
 
-## Learn more
+- Expo Router (file-based routing — every file in `src/app/` is a screen; see `AGENTS.md` for Expo-version caveats)
+- NativeWind (Tailwind for React Native) + `expo-glass-effect`
+- `expo/fetch` + native `fetch` for API calls (no Axios here, unlike the web frontend)
+- `@react-native-async-storage/async-storage`, `@react-native-community/netinfo` (offline sync)
 
-To learn more about developing your project with Expo, look at the following resources:
+## Auth & routing flow
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- `AuthContext` (`src/context/AuthContext.tsx`) holds `user`/`token` **in memory only** — not yet persisted to `AsyncStorage`, so the session is lost on app restart/reload.
+- `src/app/index.tsx` redirects based on `user.role`:
+  | Role | Redirects to |
+  |---|---|
+  | `COMMUNITY_MEMBER` | `/community` |
+  | `RANGER` | `/ranger` |
+  | `COMMUNITY_LIAISON_OFFICER` | `/liaison` |
+  | anything else (web-only roles) | `/web-only` — tells the user to use the web dashboard and logs them out |
+  | not logged in | `/login` |
 
-## Join the community
+## Status / known gaps
 
-Join our community of developers creating universal apps.
+The routes `/login`, `/community`, `/ranger`, and `/liaison` are referenced by `index.tsx` and `web-only.tsx` but **do not exist yet** under `src/app/` — only `_layout.tsx`, `index.tsx`, and `web-only.tsx` are implemented. The app will currently fail to redirect anywhere useful until those screens are added. `RoleTabPage` (`src/components/RoleTabPage.tsx`) looks like the intended shared layout for the role screens (title/subtitle/numbered item list) but isn't wired into any route yet.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Implemented services (ready to call once the screens exist):
+- `src/services/auth.service.ts` — `loginUser()` → `POST /api/auth/login`
+- `src/services/conflict.service.ts` — full conflict-report API client: submit (with evidence images via `expo-file-system`), community member's own reports, staff list, single report, ranger/CLO response update
+- `src/services/pendingConflict.service.ts` + `src/hooks/usePendingConflictSync.ts` — offline queue: `COMMUNITY_MEMBER` reports submitted without connectivity are queued locally and flushed automatically when `NetInfo` reports connectivity again (checked on mount and on every network-state change)
+
+Implemented shared components (not yet wired into any route):
+- `RoleTabPage` — generic title/subtitle/numbered-item-list layout, intended for the role landing screens
+- `ProfilePage` — avatar/name/email/role card + logout confirmation; calls `logout()` then `router.replace('/login')`
+- `ConflictReportContext` — holds the in-progress report draft (type, location, description, evidence, auto-generated `clientReportId`) across the multi-step report flow
+
+## Structure
+
+```
+src/
+  app/            # Expo Router screens (_layout, index, web-only — see gaps above)
+  components/      # RoleTabPage, ProfilePage
+  context/         # AuthContext (in-memory session), ConflictReportContext (draft report state)
+  hooks/           # usePendingConflictSync
+  services/        # api.ts (base URL), auth.service, conflict.service, pendingConflict.service
+  types/           # auth.ts, conflict.ts
+```
