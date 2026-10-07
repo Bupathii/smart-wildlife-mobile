@@ -40,14 +40,14 @@ and make sure the [backend](../../backend/smart-wildlife-backend)'s `CORS_ORIGIN
 
 ## Status / known gaps
 
-The routes `/login`, `/community`, `/ranger`, and `/liaison` are referenced by `index.tsx` and `web-only.tsx` but **do not exist yet** under `src/app/` — only `_layout.tsx`, `index.tsx`, and `web-only.tsx` are implemented. The app will currently fail to redirect anywhere useful until those screens are added. `RoleTabPage` (`src/components/RoleTabPage.tsx`) looks like the intended shared layout for the role screens (title/subtitle/numbered item list) but isn't wired into any route yet.
+The role areas exist under `src/app/`: `(auth)/login.tsx`, `community/` (home, multi-step `report/` flow, `reports/` list and detail, profile), `ranger/` (home, `conflicts/`, alerts, incident, patrol, profile) and `liaison/` (home, `conflicts/`, alerts, responses, profile). The human–wildlife conflict flow (community report → ranger / liaison response) is the implemented feature; check each remaining tab screen before assuming it is more than a `RoleTabPage` outline.
 
-Implemented services (ready to call once the screens exist):
+Implemented services:
 - `src/services/auth.service.ts` — `loginUser()` → `POST /api/auth/login`
 - `src/services/conflict.service.ts` — full conflict-report API client: submit (with evidence images via `expo-file-system`), community member's own reports, staff list, single report, ranger/CLO response update
 - `src/services/pendingConflict.service.ts` + `src/hooks/usePendingConflictSync.ts` — offline queue: `COMMUNITY_MEMBER` reports submitted without connectivity are queued locally and flushed automatically when `NetInfo` reports connectivity again (checked on mount and on every network-state change)
 
-Implemented shared components (not yet wired into any route):
+Shared components:
 - `RoleTabPage` — generic title/subtitle/numbered-item-list layout, intended for the role landing screens
 - `ProfilePage` — avatar/name/email/role card + logout confirmation; calls `logout()` then `router.replace('/login')`
 - `ConflictReportContext` — holds the in-progress report draft (type, location, description, evidence, auto-generated `clientReportId`) across the multi-step report flow
@@ -56,8 +56,8 @@ Implemented shared components (not yet wired into any route):
 
 ```
 src/
-  app/            # Expo Router screens (_layout, index, web-only — see gaps above)
-  components/      # RoleTabPage, ProfilePage
+  app/            # Expo Router screens: (auth)/login, community/, ranger/, liaison/, web-only
+  components/      # RoleTabPage, ProfilePage, conflicts/ (staff list + details)
   context/         # AuthContext (in-memory session), ConflictReportContext (draft report state)
   hooks/           # usePendingConflictSync
   services/        # api.ts (base URL), auth.service, conflict.service, pendingConflict.service
