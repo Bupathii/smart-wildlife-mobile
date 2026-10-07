@@ -40,7 +40,17 @@ and make sure the [backend](../../backend/smart-wildlife-backend)'s `CORS_ORIGIN
 
 ## Status / known gaps
 
-The role areas exist under `src/app/`: `(auth)/login.tsx`, `community/` (home, multi-step `report/` flow, `reports/` list and detail, profile), `ranger/` (home, `conflicts/`, alerts, incident, patrol, profile) and `liaison/` (home, `conflicts/`, alerts, responses, profile). The human–wildlife conflict flow (community report → ranger / liaison response) is the implemented feature; check each remaining tab screen before assuming it is more than a `RoleTabPage` outline.
+The role areas exist under `src/app/`: `(auth)/login.tsx`, `community/` (home, multi-step `report/` flow, `reports/` list and detail, profile), `ranger/` (home, `conflicts/`, alerts, incident, **patrol — implemented, see below**, profile) and `liaison/` (home, `conflicts/`, alerts, responses, profile). The human–wildlife conflict flow (community report → ranger / liaison response) is the implemented feature; check each remaining tab screen before assuming it is more than a `RoleTabPage` outline.
+
+### Ranger "My Patrol" (`src/app/ranger/patrol.tsx`)
+
+The ranger sees the patrol the Park Manager assigned on the web (route, waypoint checklist, team), presses **Start patrol**, and while the patrol is running the phone reports its position every 20 seconds so the manager can follow it on the web dashboard. **End patrol** completes it. The same screen shows insights: patrols completed, average coverage, total distance, average rating, the manager's latest evaluation and recent patrols.
+
+- **Keep the screen open.** Tracking runs only while this screen is open (it is kept awake). Background tracking needs a development build, not Expo Go.
+- **Offline.** A position taken without a connection is stored on the phone (`AsyncStorage`) and sent with the next successful report.
+- **Demo walk.** A switch that sends positions along the assigned route instead of the phone's GPS, for demonstrations away from the park.
+- **Logins** (password `Ranger@123`): `ranger.demo@wildlife.lk`, `ranger2.demo@wildlife.lk`, `ranger3.demo@wildlife.lk`. Create them with `npm run seed:app-rangers` in the backend.
+- Code: `src/services/patrol.service.ts` (API calls, offline queue, demo walk), `src/types/patrol.ts`.
 
 Implemented services:
 - `src/services/auth.service.ts` — `loginUser()` → `POST /api/auth/login`
