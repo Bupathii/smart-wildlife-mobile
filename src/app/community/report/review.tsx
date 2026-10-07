@@ -45,6 +45,10 @@ import {
   savePendingConflictReport,
 } from "@/services/pendingConflict.service";
 
+import {
+  validateConflictReportDraft,
+} from "@/utils/conflictReportValidation";
+
 function getConflictTypeLabel(
   type: string | null
 ) {
@@ -105,6 +109,11 @@ export default function ReviewScreen() {
    * ===================================================
    */
   async function handleSubmit() {
+    /*
+     * -----------------------------------------------
+     * Authentication validation
+     * -----------------------------------------------
+     */
     if (!token) {
       Alert.alert(
         "Session Expired",
@@ -114,14 +123,24 @@ export default function ReviewScreen() {
       return;
     }
 
-    if (
-      !draft.conflictType ||
-      !draft.location.source ||
-      !draft.description.trim()
-    ) {
+    /*
+     * -----------------------------------------------
+     * Final report validation
+     *
+     * Even though individual screens already perform
+     * validation, the complete draft is validated
+     * again immediately before submission.
+     * -----------------------------------------------
+     */
+    const validation =
+      validateConflictReportDraft(
+        draft
+      );
+
+    if (!validation.valid) {
       Alert.alert(
-        "Incomplete Report",
-        "Please complete the required report information."
+        validation.title,
+        validation.message
       );
 
       return;
@@ -189,14 +208,12 @@ export default function ReviewScreen() {
         });
       } catch (error: any) {
         /*
-         * API errors such as:
-         * validation,
-         * unauthorized,
-         * forbidden,
-         * server response errors
-         *
-         * should NOT automatically
-         * become offline reports.
+         * API validation,
+         * authentication,
+         * authorization,
+         * or server response errors
+         * must not automatically become
+         * offline reports.
          */
         if (
           error instanceof
@@ -207,9 +224,8 @@ export default function ReviewScreen() {
 
         /*
          * A transport/network failure may
-         * happen during file upload.
-         *
-         * Re-check the network.
+         * happen while submitting.
+         * Check network status again.
          */
         const latestNetwork =
           await NetInfo.fetch();
