@@ -3,6 +3,7 @@ import {
   ClipboardList,
   FileWarning,
   House,
+  LocateFixed,
   Map,
   UserRound,
 } from "lucide-react-native";
@@ -107,6 +108,29 @@ export default function RangerLayout() {
             size,
           }) => (
             <Map
+              color={color}
+              size={size}
+              strokeWidth={2.2}
+            />
+          ),
+        }}
+      />
+
+      {/* TRACKING */}
+
+      <Tabs.Screen
+        name="tracking"
+        options={{
+          title: "Tracking",
+
+          headerTitle:
+            "Wildlife Tracking",
+
+          tabBarIcon: ({
+            color,
+            size,
+          }) => (
+            <LocateFixed
               color={color}
               size={size}
               strokeWidth={2.2}

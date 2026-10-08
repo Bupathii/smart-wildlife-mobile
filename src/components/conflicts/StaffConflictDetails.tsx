@@ -36,6 +36,7 @@ import {
     getConflictReportById,
     updateConflictResponse,
 } from "@/services/conflict.service";
+import { resolveApiAssetUrl } from "@/services/api";
 
 import {
     ConflictReport,
@@ -302,7 +303,7 @@ export default function StaffConflictDetails() {
                     key={`${evidence.url}-${index}`}
                     source={{
                       uri:
-                        evidence.url,
+                        resolveApiAssetUrl(evidence.url),
                     }}
                     className="h-36 w-36 rounded-xl"
                     resizeMode="cover"
