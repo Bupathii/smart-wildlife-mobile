@@ -6,11 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
-import GlassBackground from '../components/GlassBackground';
-import GlassCard from '../components/GlassCard';
-import GlassButton from '../components/GlassButton';
-import { colors } from '../theme/glass';
 import { getAllIncidents, SyncStatus } from '../services/IncidentStorage';
 import { retrySynchronization } from '../services/SyncManager';
 import { INCIDENT_TYPE_LABELS } from '../services/incidentService';
@@ -23,16 +20,10 @@ function MyIncidentReportsScreen({ navigation }) {
 
   const loadIncidents = useCallback(async () => {
     const all = await getAllIncidents();
-    // Newest first
     setIncidents(all.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
   }, []);
 
-  // Reload each time the screen is focused
-  useFocusEffect(
-    useCallback(() => {
-      loadIncidents();
-    }, [loadIncidents])
-  );
+  useFocusEffect(useCallback(() => { loadIncidents(); }, [loadIncidents]));
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -47,96 +38,82 @@ function MyIncidentReportsScreen({ navigation }) {
     setRetrying(false);
   }, [loadIncidents]);
 
+  const pendingCount = incidents.filter((i) => i.syncStatus === SyncStatus.PENDING_SYNC).length;
+
   const renderItem = useCallback(({ item }) => {
     const isSynced = item.syncStatus === SyncStatus.SYNCHRONIZED;
     const label = INCIDENT_TYPE_LABELS[item.incidentType] || item.incidentType;
-    const date = new Date(item.createdAt).toLocaleDateString();
+    const date = new Date(item.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 
     return (
-      <View style={styles.reportCard}>
-        <View style={styles.reportRow}>
-          <Text style={styles.reportType}>{label}</Text>
+      <View style={styles.card}>
+        <View style={styles.cardRow}>
+          <Text style={styles.cardType}>{label}</Text>
           <View style={[styles.badge, isSynced ? styles.badgeSynced : styles.badgePending]}>
-            <Text style={styles.badgeText}>
-              {isSynced ? '● Synchronized' : '● Pending'}
-            </Text>
+            <Text style={styles.badgeText}>{isSynced ? '● Synchronized' : '● Pending'}</Text>
           </View>
         </View>
-        <Text style={styles.reportDate}>{date}</Text>
-        <Text style={styles.reportDesc} numberOfLines={2}>{item.description}</Text>
+        <Text style={styles.cardDate}>{date}</Text>
+        <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
       </View>
     );
   }, []);
 
   return (
-    <GlassBackground>
-      <View style={styles.container}>
-        <Text style={styles.heading}>My Incident Reports</Text>
+    <View style={styles.container}>
+      {pendingCount > 0 && (
+        <TouchableOpacity style={styles.syncBanner} onPress={handleRetrySync} disabled={retrying}>
+          {retrying
+            ? <ActivityIndicator color="#fff" size="small" />
+            : <Text style={styles.syncBannerText}>⟳ Sync {pendingCount} pending report{pendingCount > 1 ? 's' : ''}</Text>
+          }
+        </TouchableOpacity>
+      )}
 
-        {incidents.length === 0 ? (
-          <GlassCard style={styles.emptyCard}>
-            <Text style={styles.emptyText}>No incident reports yet.</Text>
-            <GlassButton
-              onPress={() => navigation.navigate('ReportIncident')}
-              style={styles.newBtn}
-            >
-              Report an Incident
-            </GlassButton>
-          </GlassCard>
-        ) : (
-          <>
-            <GlassButton
-              onPress={handleRetrySync}
-              loading={retrying}
-              style={styles.syncBtn}
-            >
-              Sync Pending Reports
-            </GlassButton>
-
-            <FlatList
-              data={incidents}
-              keyExtractor={(item) => item.clientIncidentId}
-              renderItem={renderItem}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={handleRefresh}
-                  tintColor={colors.accent}
-                />
-              }
-              contentContainerStyle={styles.list}
-            />
-          </>
-        )}
-      </View>
-    </GlassBackground>
+      {incidents.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No incident reports yet.</Text>
+          <TouchableOpacity style={styles.newBtn} onPress={() => navigation.navigate('ReportIncident')}>
+            <Text style={styles.newBtnText}>Report an Incident</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={incidents}
+          keyExtractor={(item) => item.clientIncidentId}
+          renderItem={renderItem}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#0F766E" />}
+          contentContainerStyle={styles.list}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
-  heading: { fontSize: 20, fontWeight: '700', color: colors.white, marginBottom: 14 },
-  emptyCard: { alignItems: 'center' },
-  emptyText: { color: colors.whiteMuted, fontSize: 14, marginBottom: 16, textAlign: 'center' },
-  newBtn: { width: '100%' },
-  syncBtn: { marginBottom: 12, paddingVertical: 10 },
-  list: { paddingBottom: 24 },
-  reportCard: {
-    backgroundColor: colors.cardOverlay,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
+  container: { flex: 1, backgroundColor: '#f5f7f5' },
+  syncBanner: {
+    backgroundColor: '#0F766E', paddingVertical: 10,
+    alignItems: 'center', flexDirection: 'row', justifyContent: 'center',
   },
-  reportRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  reportType: { fontSize: 15, fontWeight: '600', color: colors.white },
-  badge: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 },
-  badgeSynced: { backgroundColor: 'rgba(52,211,153,0.15)' },
-  badgePending: { backgroundColor: 'rgba(251,191,36,0.15)' },
-  badgeText: { fontSize: 11, fontWeight: '600', color: colors.accent },
-  reportDate: { fontSize: 11, color: colors.whiteFaint, marginBottom: 6 },
-  reportDesc: { fontSize: 13, color: colors.whiteMuted },
+  syncBannerText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  list: { padding: 16, paddingBottom: 40 },
+  card: {
+    backgroundColor: '#ffffff', borderRadius: 12, padding: 14, marginBottom: 10,
+    shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 8, elevation: 2,
+  },
+  cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  cardType: { fontSize: 14, fontWeight: '700', color: '#111827', flex: 1 },
+  badge: { borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
+  badgeSynced: { backgroundColor: '#D1FAE5' },
+  badgePending: { backgroundColor: '#FEF3C7' },
+  badgeText: { fontSize: 11, fontWeight: '600', color: '#111827' },
+  cardDate: { fontSize: 11, color: '#9CA3AF', marginBottom: 4, fontWeight: '500' },
+  cardDesc: { fontSize: 13, color: '#6B7280', lineHeight: 18 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
+  emptyText: { fontSize: 15, color: '#94A3B8', marginBottom: 20 },
+  newBtn: { backgroundColor: '#0F766E', borderRadius: 10, paddingVertical: 13, paddingHorizontal: 28 },
+  newBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
 
 export default MyIncidentReportsScreen;
