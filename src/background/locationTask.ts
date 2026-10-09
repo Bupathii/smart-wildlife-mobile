@@ -1,21 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
 import * as TaskManager from "expo-task-manager";
 
 import { API_BASE_URL } from "@/services/api";
 
 export const LOCATION_TASK_NAME = "wildlife-background-location-task";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error || !data || typeof data !== "object") {
@@ -71,13 +60,8 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
     const result = await response.json().catch(() => ({}));
     if (response.ok && result?.alertGenerated) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Wildlife Risk Alert",
-          body: `${result.animal?.animalId || payload.animalId} entered a high-risk zone.`,
-        },
-        trigger: null,
-      });
+      // Background alert notifications are intentionally disabled in Expo Go.
+      // The in-app alert popup remains active while the app is foregrounded.
     }
   } catch {
     // Retry on the next interval.

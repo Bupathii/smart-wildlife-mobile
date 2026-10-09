@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import WebView from "react-native-webview";
 import * as Location from "expo-location";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -23,6 +24,36 @@ import {
 
 type SessionStatus = "STOPPED" | "REQUESTED" | "ACTIVE";
 
+function LeafletMap({ latitude, longitude }: { latitude: number; longitude: number }) {
+  const html = `<!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>
+          html, body, #map { margin: 0; height: 100%; width: 100%; }
+          body { background: #e2e8f0; }
+          .leaflet-container { background: #dbeafe; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+          const latitude = ${Number(latitude)};
+          const longitude = ${Number(longitude)};
+          const map = L.map('map', { zoomControl: true }).setView([latitude, longitude], 14);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
+          L.circleMarker([latitude, longitude], { radius: 8, color: '#0f766e', fillColor: '#14b8a6', fillOpacity: 0.9 }).addTo(map);
+        </script>
+      </body>
+    </html>`;
+
+  return <WebView source={{ html }} style={{ flex: 1 }} javaScriptEnabled domStorageEnabled startInLoadingState />;
+}
+
 export default function RangerTrackingScreen() {
   const { token, user } = useAuth();
   const isRangerController = Platform.OS === "android";
@@ -35,6 +66,7 @@ export default function RangerTrackingScreen() {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string>("Not started");
   const [sending, setSending] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const startingSession = useRef(false);
 
@@ -405,6 +437,16 @@ export default function RangerTrackingScreen() {
       </View>
 
       <View className="mt-8 gap-3">
+        {isRangerController && (
+          <Pressable
+            onPress={() => setShowMap((current) => !current)}
+            disabled={!animalId || sessionStatus === "STOPPED"}
+            className={`rounded-2xl px-5 py-4 ${!animalId || sessionStatus === "STOPPED" ? "bg-slate-300" : "bg-sky-600"}`}
+          >
+            <Text className="text-center text-base font-bold text-white">MAP</Text>
+          </Pressable>
+        )}
+
         <Pressable
           onPress={startTracking}
           disabled={!isRangerController || sessionStatus !== "STOPPED" || sending}
@@ -433,6 +475,12 @@ export default function RangerTrackingScreen() {
           </Text>
         </Pressable>
       </View>
+
+      {showMap && isRangerController && latitude !== null && longitude !== null && (
+        <View className="mt-6 h-56 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+          <LeafletMap latitude={latitude} longitude={longitude} />
+        </View>
+      )}
 
       {sending && (
         <View className="mt-6 flex-row items-center justify-center gap-2">
