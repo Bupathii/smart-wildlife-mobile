@@ -235,6 +235,47 @@ export default function RangerLayout() {
           ),
         }}
       />
+
+      {/* INCIDENT HIDDEN ROUTES — Member 3: wildlife-incident-reporting */}
+
+      <Tabs.Screen
+        name="incident-report"
+        options={{
+          title: "Report",
+          headerTitle: "Report Incident",
+          headerShown: true,
+          tabBarItemStyle: { display: "none" },
+          tabBarIcon: ({ color, size }) => (
+            <FileWarning color={color} size={size} strokeWidth={2.2} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="incident-confirm"
+        options={{
+          title: "Report Status",
+          headerTitle: "Report Status",
+          headerShown: true,
+          tabBarItemStyle: { display: "none" },
+          tabBarIcon: ({ color, size }) => (
+            <FileWarning color={color} size={size} strokeWidth={2.2} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="my-incidents"
+        options={{
+          title: "My Reports",
+          headerTitle: "My Reports",
+          headerShown: true,
+          tabBarItemStyle: { display: "none" },
+          tabBarIcon: ({ color, size }) => (
+            <FileWarning color={color} size={size} strokeWidth={2.2} />
+          ),
+        }}
+      />
     </Tabs>
   );
-}
+}
