@@ -49,3 +49,19 @@ export async function getPendingIncidents(): Promise<PendingIncidentReport[]> {
 export async function clearAllIncidents(): Promise<void> {
   await AsyncStorage.removeItem(STORAGE_KEY);
 }
+
+/**
+ * Permanently remove a single report from local storage by its client-generated ID.
+ * Works for both Pending and Synchronized reports.
+ *
+ * @param clientIncidentId - The UUID assigned when the report was first created.
+ */
+export async function deleteIncident(
+  clientIncidentId: string,
+): Promise<void> {
+  const existing = await getAllIncidents();
+  const updated = existing.filter(
+    (r) => r.clientIncidentId !== clientIncidentId,
+  );
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+}

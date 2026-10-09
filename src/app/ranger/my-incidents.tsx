@@ -10,12 +10,13 @@ import {
 } from "react-native";
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
-import { RefreshCw } from "lucide-react-native";
+import { RefreshCw, Trash2 } from "lucide-react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { useAuth } from "@/context/AuthContext";
 import {
   getAllIncidents,
   updateIncidentStatus,
+  deleteIncident,
 } from "@/services/incident.storage";
 import { syncPendingIncidents } from "@/services/incident.sync";
 import { PendingIncidentReport } from "@/types/incident";
@@ -44,11 +45,32 @@ function statusStyle(status: string) {
   };
 }
 
-function ReportCard({ report }: { report: PendingIncidentReport }) {
+function ReportCard({
+  report,
+  onDelete,
+}: {
+  report: PendingIncidentReport;
+  onDelete: (id: string) => void;
+}) {
   const ss = statusStyle(report.syncStatus);
   const dateStr = report.createdAt
     ? new Date(report.createdAt).toISOString().slice(0, 10)
     : "";
+
+  function handleDeletePress() {
+    Alert.alert(
+      "Delete Report",
+      "Are you sure you want to permanently delete this incident report? This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(report.clientIncidentId),
+        },
+      ],
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -64,11 +86,25 @@ function ReportCard({ report }: { report: PendingIncidentReport }) {
             </Text>
           ) : null}
         </View>
-        <View style={[styles.badge, ss.badge]}>
-          <View style={[styles.dot, ss.dot]} />
-          <Text style={[styles.badgeText, ss.text]}>
-            {report.syncStatus === "Synchronized" ? "Synchronized" : "Pending"}
-          </Text>
+
+        {/* Status badge + delete button stacked on the right */}
+        <View style={styles.cardRight}>
+          <View style={[styles.badge, ss.badge]}>
+            <View style={[styles.dot, ss.dot]} />
+            <Text style={[styles.badgeText, ss.text]}>
+              {report.syncStatus === "Synchronized" ? "Synchronized" : "Pending"}
+            </Text>
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.65 }]}
+            onPress={handleDeletePress}
+            hitSlop={8}
+            accessibilityLabel="Delete report"
+            accessibilityRole="button"
+          >
+            <Trash2 size={16} color="#e11d48" strokeWidth={2} />
+          </Pressable>
         </View>
       </View>
     </View>
@@ -93,6 +129,19 @@ export default function MyIncidentsScreen() {
     }
     setReports(all);
   }, []);
+
+  const handleDelete = useCallback(
+    async (clientIncidentId: string) => {
+      try {
+        await deleteIncident(clientIncidentId);
+        // Refresh the list immediately after deletion
+        await loadReports();
+      } catch {
+        Alert.alert("Error", "Could not delete the report. Please try again.");
+      }
+    },
+    [loadReports],
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -205,7 +254,11 @@ export default function MyIncidentsScreen() {
           </View>
         ) : (
           reports.map((r) => (
-            <ReportCard key={r.clientIncidentId} report={r} />
+            <ReportCard
+              key={r.clientIncidentId}
+              report={r}
+              onDelete={handleDelete}
+            />
           ))
         )}
       </ScrollView>
@@ -272,6 +325,24 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   cardLeft: { flex: 1 },
+
+  /* Right-hand column: badge stacked above delete button */
+  cardRight: {
+    alignItems: "flex-end",
+    gap: 10,
+    flexShrink: 0,
+  },
+
+  deleteBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: "#fff1f2",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#fecdd3",
+  },
   cardTitle: {
     fontSize: 15,
     fontWeight: "700",
