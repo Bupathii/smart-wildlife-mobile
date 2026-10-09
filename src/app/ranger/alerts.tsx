@@ -1,7 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import WebView from "react-native-webview";
 import { useAuth } from "@/context/AuthContext";
 import { API_BASE_URL } from "@/services/api";
+
+function LeafletMap({ latitude, longitude }: { latitude: number; longitude: number }) {
+  const html = `<!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>
+          html, body, #map { margin: 0; height: 100%; width: 100%; }
+          body { background: #e2e8f0; }
+          .leaflet-container { background: #dbeafe; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+          const latitude = ${Number(latitude)};
+          const longitude = ${Number(longitude)};
+          const map = L.map('map', { zoomControl: true }).setView([latitude, longitude], 14);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
+          L.circle([latitude, longitude], { radius: 200, color: '#ef4444', fillColor: '#f87171', fillOpacity: 0.35 }).addTo(map);
+          L.circleMarker([latitude, longitude], { radius: 8, color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.9 }).addTo(map);
+        </script>
+      </body>
+    </html>`;
+
+  return <WebView source={{ html }} style={{ flex: 1 }} javaScriptEnabled domStorageEnabled startInLoadingState />;
+}
 
 type ApiAlert = {
   alertId: string;
@@ -19,6 +51,7 @@ export default function RangerAlerts() {
   const [alerts, setAlerts] = useState<ApiAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [alarmEnabled, setAlarmEnabled] = useState(true);
 
   const activeAlerts = useMemo(
     () => alerts.filter((alert) => !["RESOLVED", "ESCALATED"].includes(String(alert.status).toUpperCase())),
@@ -137,6 +170,22 @@ export default function RangerAlerts() {
     return () => clearInterval(refreshTimer);
   }, [token]);
 
+  useEffect(() => {
+    if (!alarmEnabled) return;
+
+    const newestActive = activeAlerts[0];
+    if (!newestActive) return;
+
+    Alert.alert(
+      "Wildlife Risk Alert",
+      `${newestActive.animalId} has entered ${newestActive.zone}. Tap to view the alert.`,
+      [
+        { text: "Turn off alarm", style: "destructive", onPress: () => setAlarmEnabled(false) },
+        { text: "Dismiss", style: "cancel" },
+      ]
+    );
+  }, [activeAlerts, alarmEnabled]);
+
   return (
     <ScrollView className="flex-1 bg-slate-50 px-5 py-6">
       <Text className="text-3xl font-bold text-slate-900">Wildlife Risk Alerts</Text>
@@ -167,6 +216,10 @@ export default function RangerAlerts() {
                 Location: {alert.latitude}, {alert.longitude}
               </Text>
               <Text className="mt-2 text-sm font-medium text-slate-800">Status: {alert.status}</Text>
+
+              <View className="mt-4 h-36 overflow-hidden rounded-2xl border border-slate-200">
+                <LeafletMap latitude={Number(alert.latitude)} longitude={Number(alert.longitude)} />
+              </View>
 
               <View className="mt-4 gap-2">
                 <Pressable
