@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
   useCallback,
@@ -21,7 +23,7 @@ import { saveIncident, updateIncidentStatus } from "@/services/incident.storage"
 import { submitIncidentReport } from "@/services/incident.service";
 import { IncidentType, PendingIncidentReport } from "@/types/incident";
 import NetInfo from "@react-native-community/netinfo";
-import { MapPin, X, Navigation } from "lucide-react-native";
+import { Camera, Images, MapPin, X, Navigation } from "lucide-react-native";
 
 const INCIDENT_TYPES: { value: IncidentType; label: string }[] = [
   { value: "POACHING",          label: "Poaching" },
@@ -53,6 +55,9 @@ export default function IncidentReportScreen() {
   const [severity, setSeverity] = useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
   const [step, setStep] = useState<Step>("form");
 
+  /* evidence photo */
+  const [evidenceUri, setEvidenceUri] = useState<string | null>(null);
+
   /* location state */
   const [markerCoord, setMarkerCoord] = useState<{
     latitude: number;
@@ -69,6 +74,39 @@ export default function IncidentReportScreen() {
     latitudeDelta: 0.5,
     longitudeDelta: 0.3,
   };
+
+  /* --- Evidence photo --- */
+  const handleTakePhoto = useCallback(async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Camera permission is needed to take a photo.");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      allowsEditing: false,
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setEvidenceUri(result.assets[0].uri);
+    }
+  }, []);
+
+  const handleSelectFromGallery = useCallback(async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Photo library permission is needed to select a photo.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsMultipleSelection: false,
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setEvidenceUri(result.assets[0].uri);
+    }
+  }, []);
 
   /* --- GPS --- */
   const handleGetGPS = useCallback(async () => {
@@ -133,7 +171,7 @@ export default function IncidentReportScreen() {
         source: "GPS",
         timestamp: new Date().toISOString(),
       },
-      evidenceUris: [],
+      evidenceUris: evidenceUri ? [evidenceUri] : [],
       createdAt: new Date().toISOString(),
       syncStatus: "Pending",
     };
@@ -176,7 +214,7 @@ export default function IncidentReportScreen() {
       pathname: "/ranger/incident-confirm",
       params: { clientIncidentId, syncStatus, serverId: serverId ?? "" },
     });
-  }, [description, markerCoord, incidentType, severity, token]);
+  }, [description, markerCoord, incidentType, severity, token, evidenceUri]);
 
   /* ---- MAP VIEW ---- */
   if (step === "map") {
@@ -310,6 +348,36 @@ export default function IncidentReportScreen() {
           </View>
         )}
 
+        {/* Evidence Photo */}
+        <Text style={styles.sectionLabel}>Evidence Photo</Text>
+        <View style={styles.evidenceBtnRow}>
+          <Pressable style={styles.evidenceBtn} onPress={handleTakePhoto}>
+            <Camera size={18} color={PRIMARY} strokeWidth={2} />
+            <Text style={styles.evidenceBtnText}>Camera</Text>
+          </Pressable>
+          <Pressable style={[styles.evidenceBtn, styles.evidenceBtnGallery]} onPress={handleSelectFromGallery}>
+            <Images size={18} color="#166534" strokeWidth={2} />
+            <Text style={[styles.evidenceBtnText, styles.evidenceBtnGalleryText]}>Gallery</Text>
+          </Pressable>
+        </View>
+
+        {evidenceUri && (
+          <View style={styles.evidenceThumbContainer}>
+            <Image
+              source={{ uri: evidenceUri }}
+              style={styles.evidenceThumb}
+              resizeMode="cover"
+            />
+            <Pressable
+              style={styles.evidenceRemoveBtn}
+              onPress={() => setEvidenceUri(null)}
+              hitSlop={8}
+            >
+              <X size={12} color="#fff" strokeWidth={3} />
+            </Pressable>
+          </View>
+        )}
+
         {/* Description */}
         <Text style={styles.sectionLabel}>Description</Text>
         <TextInput
@@ -419,6 +487,50 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   coordText: { fontSize: 12, color: "#166534", fontWeight: "500" },
+
+  /* Evidence photo */
+  evidenceBtnRow: { flexDirection: "row", gap: 10 },
+  evidenceBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 13,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: PRIMARY,
+    backgroundColor: "#fff",
+  },
+  evidenceBtnGallery: {
+    borderColor: "#166534",
+    backgroundColor: "#dcfce7",
+  },
+  evidenceBtnText: { fontSize: 14, color: PRIMARY, fontWeight: "600" },
+  evidenceBtnGalleryText: { color: "#166534" },
+  evidenceThumbContainer: {
+    marginTop: 10,
+    position: "relative",
+    alignSelf: "flex-start",
+  },
+  evidenceThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  evidenceRemoveBtn: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "#e11d48",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   /* Description */
   textArea: {
