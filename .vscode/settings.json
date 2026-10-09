@@ -1,0 +1,10 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit"
+  },
+  "task.allowAutomaticTasks": "off",
+  "debug.openDebug": "neverOpen",
+  "terminal.integrated.inheritEnv": false
+}
