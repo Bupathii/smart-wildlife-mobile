@@ -195,6 +195,7 @@ export default function IncidentReportScreen() {
             latitude: markerCoord.latitude,
             longitude: markerCoord.longitude,
             locationTimestamp: report.location.timestamp,
+            evidenceUris: evidenceUri ? [evidenceUri] : [],
           },
           token,
         );

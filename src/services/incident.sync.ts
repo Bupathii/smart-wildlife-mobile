@@ -52,6 +52,7 @@ export async function syncPendingIncidents(
           latitude: report.location.latitude,
           longitude: report.location.longitude,
           locationTimestamp: report.location.timestamp,
+          evidenceUris: report.evidenceUris ?? [],
         },
         token,
       );
