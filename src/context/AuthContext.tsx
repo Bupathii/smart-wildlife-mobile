@@ -7,7 +7,7 @@ import {
     useContext,
     useState,
 } from "react";
-import { Alert, Platform } from "react-native";
+import { Alert } from "react-native";
 
 import { loginUser } from "@/services/auth.service";
 import { getRangerAlerts } from "@/services/tracking.service";
@@ -49,7 +49,7 @@ export function AuthProvider({
   }, []);
 
   useEffect(() => {
-    if (!token || user?.role !== "RANGER" || Platform.OS !== "android") {
+    if (!token || user?.role !== "RANGER") {
       seenAlertIds.current = null;
       return;
     }
