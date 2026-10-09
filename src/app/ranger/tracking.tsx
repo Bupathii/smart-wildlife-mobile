@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -10,21 +11,73 @@ import {
 import * as Location from "expo-location";
 import { useAuth } from "@/context/AuthContext";
 import {
+  activateCollarTracking,
+  getAnimalTrackingSession,
+  getCollarTrackingSession,
   getTrackedAnimals,
   sendAnimalLocation,
+  startRemoteTracking as requestTrackingStart,
+  stopRemoteTracking as requestTrackingStop,
   type TrackedAnimal,
 } from "@/services/tracking.service";
 
+type SessionStatus = "STOPPED" | "REQUESTED" | "ACTIVE";
+
 export default function RangerTrackingScreen() {
   const { token, user } = useAuth();
+  const isRangerController = Platform.OS === "android";
   const [animals, setAnimals] = useState<TrackedAnimal[]>([]);
   const [animalId, setAnimalId] = useState("");
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>("STOPPED");
+  const [sessionAnimalName, setSessionAnimalName] = useState("");
   const [isTracking, setIsTracking] = useState(false);
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string>("Not started");
   const [sending, setSending] = useState(false);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
+  const startingSession = useRef(false);
+
+  useEffect(() => {
+    if (isRangerController) return;
+    let isMounted = true;
+
+    const pollForTrackingRequest = async () => {
+      if (!token || startingSession.current) return;
+      try {
+        const session = await getCollarTrackingSession(token);
+        if (!isMounted) return;
+
+        if (session?.status === "REQUESTED") {
+          startingSession.current = true;
+          setAnimalId(session.animalId);
+          setSessionAnimalName(session.name);
+          setSessionStatus("REQUESTED");
+          try {
+            await startLocalTracking(session.animalId, true);
+          } finally {
+            startingSession.current = false;
+          }
+        } else if (session?.status === "ACTIVE") {
+          setAnimalId(session.animalId);
+          setSessionAnimalName(session.name);
+          setSessionStatus("ACTIVE");
+        } else if (isTracking) {
+          stopLocalTracking();
+          setSessionStatus("STOPPED");
+        }
+      } catch {
+        // The collar retries on the next poll while the backend is unavailable.
+      }
+    };
+
+    void pollForTrackingRequest();
+    const pollTimer = setInterval(() => void pollForTrackingRequest(), 2000);
+    return () => {
+      isMounted = false;
+      clearInterval(pollTimer);
+    };
+  }, [isRangerController, isTracking, token]);
 
   useEffect(() => {
     let isMounted = true;
@@ -62,6 +115,47 @@ export default function RangerTrackingScreen() {
   }, [token]);
 
   useEffect(() => {
+    if (!isRangerController || !token || !animalId) return;
+    let isMounted = true;
+    let isPolling = false;
+
+    const refreshController = async () => {
+      if (isPolling) return;
+      isPolling = true;
+      try {
+        const [session, registeredAnimals] = await Promise.all([
+          getAnimalTrackingSession(token, animalId),
+          getTrackedAnimals(token),
+        ]);
+        if (!isMounted) return;
+
+        setSessionStatus(session.status);
+        const animal = registeredAnimals.find((item) => item.animalId === animalId);
+        setSessionAnimalName(animal?.name || animalId);
+        const location = animal?.currentLocation;
+        if (location && Number.isFinite(location.latitude) && Number.isFinite(location.longitude)) {
+          setLatitude(location.latitude ?? null);
+          setLongitude(location.longitude ?? null);
+          setUpdatedAt(location.lastUpdated
+            ? new Date(location.lastUpdated).toLocaleTimeString()
+            : "Recently updated");
+        }
+      } catch {
+        // Keep the last known state visible and retry on the next poll.
+      } finally {
+        isPolling = false;
+      }
+    };
+
+    void refreshController();
+    const refreshTimer = setInterval(() => void refreshController(), 3000);
+    return () => {
+      isMounted = false;
+      clearInterval(refreshTimer);
+    };
+  }, [animalId, isRangerController, token]);
+
+  useEffect(() => {
     return () => {
       if (locationSubscription.current) {
         locationSubscription.current.remove();
@@ -69,9 +163,18 @@ export default function RangerTrackingScreen() {
     };
   }, []);
 
-  async function submitLocation(nextLatitude: number, nextLongitude: number) {
-    if (!animalId) {
-      Alert.alert("Select an animal", "Register and select an animal before starting GPS tracking.");
+  function stopLocalTracking() {
+    locationSubscription.current?.remove();
+    locationSubscription.current = null;
+    setIsTracking(false);
+  }
+
+  async function submitLocation(
+    trackedAnimalId: string,
+    nextLatitude: number,
+    nextLongitude: number
+  ) {
+    if (!trackedAnimalId) {
       return;
     }
 
@@ -83,19 +186,13 @@ export default function RangerTrackingScreen() {
     setSending(true);
 
     try {
-      const response = await sendAnimalLocation(token, {
-        animalId,
+      await sendAnimalLocation(token, {
+        animalId: trackedAnimalId,
         latitude: nextLatitude,
         longitude: nextLongitude,
         timestamp: new Date().toISOString(),
       });
 
-      if (response.alertGenerated) {
-        Alert.alert(
-          "Wildlife Risk Alert",
-          `Alert ${response.alertId} generated for ${animalId}. Ranger has been notified.`
-        );
-      }
     } catch (error) {
       Alert.alert(
         "Tracking Error",
@@ -106,9 +203,8 @@ export default function RangerTrackingScreen() {
     }
   }
 
-  async function startTracking() {
-    if (!animalId) {
-      Alert.alert("Select an animal", "Register an animal in the Animals page before starting tracking.");
+  async function startLocalTracking(trackedAnimalId: string, remotelyRequested = false) {
+    if (!token || !trackedAnimalId || locationSubscription.current) {
       return;
     }
 
@@ -119,6 +215,10 @@ export default function RangerTrackingScreen() {
           "Location Permission Required",
           "This prototype GPS collar needs location permission to send animal coordinates."
         );
+        if (remotelyRequested) {
+          await requestTrackingStop(token, trackedAnimalId).catch(() => undefined);
+          setSessionStatus("STOPPED");
+        }
         return;
       }
 
@@ -129,11 +229,16 @@ export default function RangerTrackingScreen() {
       const currentLat = currentPosition.coords.latitude;
       const currentLng = currentPosition.coords.longitude;
 
+      setAnimalId(trackedAnimalId);
       setLatitude(currentLat);
       setLongitude(currentLng);
       setUpdatedAt(new Date().toLocaleTimeString());
 
-      await submitLocation(currentLat, currentLng);
+      if (remotelyRequested) {
+        await activateCollarTracking(token, trackedAnimalId);
+        setSessionStatus("ACTIVE");
+      }
+      await submitLocation(trackedAnimalId, currentLat, currentLng);
 
       const subscription = await Location.watchPositionAsync(
         {
@@ -149,13 +254,20 @@ export default function RangerTrackingScreen() {
           setLongitude(nextLng);
           setUpdatedAt(new Date().toLocaleTimeString());
 
-          void submitLocation(nextLat, nextLng);
+          void submitLocation(trackedAnimalId, nextLat, nextLng);
         }
       );
 
       locationSubscription.current = subscription;
       setIsTracking(true);
     } catch (error) {
+      locationSubscription.current?.remove();
+      locationSubscription.current = null;
+      setIsTracking(false);
+      if (remotelyRequested) {
+        await requestTrackingStop(token, trackedAnimalId).catch(() => undefined);
+        setSessionStatus("STOPPED");
+      }
       Alert.alert(
         "GPS unavailable",
         error instanceof Error ? error.message : "Unable to access GPS position."
@@ -163,13 +275,47 @@ export default function RangerTrackingScreen() {
     }
   }
 
-  function stopTracking() {
+  async function startTracking() {
+    if (!isRangerController) return;
+    if (!animalId) {
+      Alert.alert("Select an animal", "Register an animal in the Animals page before starting tracking.");
+      return;
+    }
+    if (!token) {
+      Alert.alert("Authentication Required", "Please log in to start tracking.");
+      return;
+    }
+
+    setSending(true);
+    try {
+      await requestTrackingStart(token, animalId);
+      setSessionStatus("REQUESTED");
+      setSessionAnimalName(animals.find((animal) => animal.animalId === animalId)?.name || animalId);
+      Alert.alert(
+        "iPhone collar requested",
+        `The iPhone logged into this Ranger account will start tracking ${animalId} when it receives the request. Keep the tracking screen open on the iPhone.`
+      );
+    } catch (error) {
+      Alert.alert("Tracking request failed", error instanceof Error ? error.message : "Unable to contact the collar phone.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function stopTracking() {
+    if (!isRangerController || !token || !animalId) return;
     if (locationSubscription.current) {
       locationSubscription.current.remove();
       locationSubscription.current = null;
     }
     setIsTracking(false);
-    Alert.alert("Tracking stopped", "The prototype collar is no longer sending GPS updates.");
+    try {
+      await requestTrackingStop(token, animalId);
+      setSessionStatus("STOPPED");
+      Alert.alert("Tracking stopped", `The iPhone collar stopped tracking ${animalId}.`);
+    } catch (error) {
+      Alert.alert("Stop request failed", error instanceof Error ? error.message : "Unable to stop remote tracking.");
+    }
   }
 
   return (
@@ -181,38 +327,63 @@ export default function RangerTrackingScreen() {
           Prototype GPS collar
         </Text>
 
-        <Text className="mt-4 text-sm font-semibold text-slate-700">Select registered animal</Text>
-        <View className="mt-2 flex-row flex-wrap gap-2">
-          {animals.map((animal) => (
-            <Pressable
-              key={animal.animalId}
-              onPress={() => setAnimalId(animal.animalId)}
-              disabled={isTracking || sending}
-              className={`rounded-xl border px-3 py-2 ${
-                animalId === animal.animalId
-                  ? "border-emerald-600 bg-emerald-600"
-                  : "border-slate-200 bg-white"
-              }`}
-            >
-              <Text className={`text-sm font-semibold ${
-                animalId === animal.animalId ? "text-white" : "text-slate-700"
-              }`}>
-                {animal.animalId} · {animal.name}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-        {animals.length === 0 && (
-          <Text className="mt-2 text-sm text-amber-700">Register an animal in the dashboard first.</Text>
+        {isRangerController ? (
+          <>
+            <Text className="mt-4 text-sm font-semibold text-slate-700">Select animal to track on iPhone</Text>
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              {animals.map((animal) => (
+                <Pressable
+                  key={animal.animalId}
+                  onPress={() => setAnimalId(animal.animalId)}
+                  disabled={sessionStatus !== "STOPPED" || sending}
+                  className={`rounded-xl border px-3 py-2 ${
+                    animalId === animal.animalId
+                      ? "border-emerald-600 bg-emerald-600"
+                      : "border-slate-200 bg-white"
+                  }`}
+                >
+                  <Text className={`text-sm font-semibold ${
+                    animalId === animal.animalId ? "text-white" : "text-slate-700"
+                  }`}>
+                    {animal.animalId} · {animal.name}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            {animals.length === 0 && (
+              <Text className="mt-2 text-sm text-amber-700">Register an animal in the dashboard first.</Text>
+            )}
+          </>
+        ) : (
+          <View className="mt-4 rounded-xl bg-emerald-50 p-3">
+            <Text className="text-sm font-semibold text-emerald-800">
+              {isTracking ? `Sending GPS for ${sessionAnimalName || animalId}` : "iPhone collar standby"}
+            </Text>
+            <Text className="mt-1 text-xs text-emerald-700">
+              Keep this screen open. It starts GPS when the Ranger requests tracking from Android.
+            </Text>
+          </View>
         )}
 
         <View className="mt-4 space-y-3">
           <Text className="text-base text-slate-700">
-            Animal: <Text className="font-bold text-slate-900">{animalId || "Not selected"}</Text>
+            Animal: <Text className="font-bold text-slate-900">{sessionAnimalName || animalId || "Not selected"}</Text>
           </Text>
 
           <Text className="text-base text-slate-700">
-            Status: <Text className="font-bold text-emerald-600">{isTracking ? "🟢 Tracking" : "🔴 Offline"}</Text>
+            Status: <Text className="font-bold text-emerald-600">
+              {isRangerController
+                ? sessionStatus === "ACTIVE"
+                  ? "Tracking from iPhone"
+                  : sessionStatus === "REQUESTED"
+                    ? "Waiting for iPhone"
+                    : "Stopped"
+                : isTracking
+                  ? "Sending GPS"
+                  : sessionStatus === "REQUESTED"
+                    ? "Starting collar"
+                    : "Waiting for Ranger"}
+            </Text>
           </Text>
 
           <Text className="text-base text-slate-700">
@@ -236,20 +407,30 @@ export default function RangerTrackingScreen() {
       <View className="mt-8 gap-3">
         <Pressable
           onPress={startTracking}
-          disabled={isTracking || sending}
-          className={`rounded-2xl px-5 py-4 ${isTracking || sending ? "bg-emerald-200" : "bg-emerald-600"}`}
+          disabled={!isRangerController || sessionStatus !== "STOPPED" || sending}
+          className={`rounded-2xl px-5 py-4 ${!isRangerController || sessionStatus !== "STOPPED" || sending ? "bg-emerald-200" : "bg-emerald-600"}`}
         >
           <Text className="text-center text-base font-bold text-white">
-            {sending ? "Sending GPS..." : "START TRACKING"}
+            {!isRangerController
+              ? (isTracking ? "IPHONE COLLAR ACTIVE" : "WAITING FOR RANGER REQUEST")
+              : sessionStatus === "REQUESTED"
+                ? "WAITING FOR IPHONE"
+                : sessionStatus === "ACTIVE"
+                  ? "IPHONE TRACKING ACTIVE"
+                  : sending
+                    ? "SENDING REQUEST..."
+                    : "START TRACKING ON IPHONE"}
           </Text>
         </Pressable>
 
         <Pressable
           onPress={stopTracking}
-          disabled={!isTracking}
-          className={`rounded-2xl px-5 py-4 ${!isTracking ? "bg-slate-200" : "bg-red-600"}`}
+          disabled={!isRangerController || sessionStatus === "STOPPED"}
+          className={`rounded-2xl px-5 py-4 ${!isRangerController || sessionStatus === "STOPPED" ? "bg-slate-200" : "bg-red-600"}`}
         >
-          <Text className="text-center text-base font-bold text-white">STOP TRACKING</Text>
+          <Text className="text-center text-base font-bold text-white">
+            {isRangerController ? "STOP IPHONE TRACKING" : "CONTROLLED BY RANGER PHONE"}
+          </Text>
         </Pressable>
       </View>
 
