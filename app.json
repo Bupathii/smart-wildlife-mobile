@@ -32,6 +32,18 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Wildlife Conservation to keep tracking the selected animal in the background.",
+          "locationWhenInUsePermission": "Allow Wildlife Conservation to access your location while tracking the animal.",
+          "isBackgroundLocationEnabled": true,
+          "foregroundService": {
+            "notificationTitle": "Wildlife tracking active",
+            "notificationBody": "Sending animal GPS updates to the ranger backend."
+          }
+        }
       ]
     ],
     "experiments": {
