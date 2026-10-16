@@ -1,20 +1,22 @@
-import { Moon, Sun } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { MoonStar, Sun } from "lucide-react-native";
+import { Text } from "react-native";
 import { useAppTheme } from "@/theme/ThemeContext";
+import { SpringPressable } from "@/components/premium/Motion";
 
 export function ThemeToggle({ compact = false, header = false }: { compact?: boolean; header?: boolean }) {
   const { dark, colors, toggle } = useAppTheme();
-  const foreground = header ? "#FFFFFF" : colors.text;
+  const foreground = header ? "#F9FAF5" : colors.primary;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`Switch to ${dark ? "light" : "dark"} mode`}
-      onPress={toggle}
-      style={{ flexDirection: "row", alignItems: "center", gap: 9, paddingHorizontal: compact ? 10 : 15,
-        paddingVertical: 11, borderRadius: 14, backgroundColor: header ? "rgba(255,255,255,0.15)" : colors.surfaceAlt,
-        borderWidth: header ? 0 : 1, borderColor: colors.border }}>
-      {dark ? <Sun size={19} color={foreground} /> : <Moon size={19} color={foreground} />}
-      {!compact && <Text style={{ color: foreground, fontSize: 13, fontWeight: "700" }}>
+    <SpringPressable accessibilityRole="button" accessibilityLabel={`Switch to ${dark ? "light" : "dark"} mode`}
+      accessibilityHint="Toggle the WildSentinel color theme" onPress={toggle}
+      style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9,
+        paddingHorizontal: compact ? 12 : 16, minWidth: compact ? 43 : undefined,
+        height: 43, borderRadius: 15, backgroundColor: header ? "rgba(255,255,255,0.14)" : colors.surface,
+        borderWidth: 1, borderColor: header ? "rgba(255,255,255,0.18)" : colors.border }}>
+      {dark ? <Sun size={18} color={foreground} strokeWidth={2} /> : <MoonStar size={18} color={foreground} strokeWidth={2} />}
+      {!compact && <Text style={{ color: foreground, fontSize: 12.5, fontWeight: "800" }}>
         {dark ? "Light mode" : "Dark mode"}
       </Text>}
-    </Pressable>
+    </SpringPressable>
   );
 }

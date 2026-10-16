@@ -373,7 +373,7 @@ export default function MyReportsScreen() {
     pendingReports.length > 0;
 
   return (
-    <View className="flex-1 bg-slate-50 dark:bg-[#081A17]">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -401,11 +401,11 @@ export default function MyReportsScreen() {
 
         <View className="flex-row items-start justify-between">
           <View className="flex-1 pr-4">
-            <Text className="text-[26px] font-bold text-slate-900 dark:text-[#F1F7F1]">
+            <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
               My Reports
             </Text>
 
-            <Text className="mt-2 text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
+            <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
               View your submitted
               reports and track their
               current response status.
@@ -526,8 +526,8 @@ export default function MyReportsScreen() {
                     }
                     className={`rounded-full px-4 py-2.5 ${
                       selected
-                        ? "bg-teal-700"
-                        : "border border-slate-200 bg-white"
+                        ? "bg-[#14785D]"
+                        : "border border-[#E0E9E2] bg-white"
                     }`}
                   >
                     <Text
@@ -557,7 +557,7 @@ export default function MyReportsScreen() {
               color="#0F766E"
             />
 
-            <Text className="mt-3 text-sm text-slate-500 dark:text-[#A3B9B0]">
+            <Text className="mt-3 text-sm text-[#6D7D73] dark:text-[#A3B9B0]">
               Loading reports...
             </Text>
           </View>
@@ -679,8 +679,8 @@ export default function MyReportsScreen() {
           (!showPending ||
             pendingReports.length ===
               0) && (
-            <View className="mt-8 items-center rounded-2xl border border-slate-200 bg-white p-10 dark:bg-[#102923] dark:border-[#28493D]">
-              <View className="h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-[#19382E]">
+            <View className="mt-8 items-center rounded-2xl border border-[#E0E9E2] bg-white p-10 dark:bg-[#102923] dark:border-[#28493D]">
+              <View className="h-14 w-14 items-center justify-center rounded-full bg-[#EAF1EB] dark:bg-[#19382E]">
                 <FileText
                   size={25}
                   color="#64748B"
@@ -723,7 +723,7 @@ function PendingReportCard({
     <View className="rounded-2xl border border-blue-200 bg-white p-5 dark:bg-[#102923]">
       <View className="flex-row items-start">
         <View className="flex-1">
-          <Text className="text-base font-bold text-slate-900 dark:text-[#F1F7F1]">
+          <Text className="text-base font-bold text-[#172F28] dark:text-[#F1F7F1]">
             {getConflictLabel(
               draft.conflictType ||
                 "OTHER"
@@ -745,7 +745,7 @@ function PendingReportCard({
 
       <Text
         numberOfLines={2}
-        className="mt-3 text-sm leading-5 text-slate-500 dark:text-[#A3B9B0]"
+        className="mt-3 text-sm leading-5 text-[#6D7D73] dark:text-[#A3B9B0]"
       >
         {draft.description}
       </Text>
@@ -759,7 +759,7 @@ function PendingReportCard({
 
           <Text
             numberOfLines={1}
-            className="ml-2 flex-1 text-xs text-slate-500 dark:text-[#A3B9B0]"
+            className="ml-2 flex-1 text-xs text-[#6D7D73] dark:text-[#A3B9B0]"
           >
             {draft.location
               .source ===
@@ -781,7 +781,7 @@ function PendingReportCard({
             color="#64748B"
           />
 
-          <Text className="ml-2 text-xs text-slate-500 dark:text-[#A3B9B0]">
+          <Text className="ml-2 text-xs text-[#6D7D73] dark:text-[#A3B9B0]">
             Saved{" "}
             {formatDate(
               savedAt
@@ -841,11 +841,11 @@ function ReportCard({
           },
         })
       }
-      className="rounded-2xl border border-slate-200 bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]"
+      className="rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]"
     >
       <View className="flex-row items-start">
         <View className="flex-1">
-          <Text className="text-base font-bold text-slate-900 dark:text-[#F1F7F1]">
+          <Text className="text-base font-bold text-[#172F28] dark:text-[#F1F7F1]">
             {getConflictLabel(
               report.conflictType
             )}
@@ -866,7 +866,7 @@ function ReportCard({
 
       <Text
         numberOfLines={2}
-        className="mt-3 text-sm leading-5 text-slate-500 dark:text-[#A3B9B0]"
+        className="mt-3 text-sm leading-5 text-[#6D7D73] dark:text-[#A3B9B0]"
       >
         {report.description}
       </Text>
@@ -880,7 +880,7 @@ function ReportCard({
 
           <Text
             numberOfLines={1}
-            className="ml-2 flex-1 text-xs text-slate-500 dark:text-[#A3B9B0]"
+            className="ml-2 flex-1 text-xs text-[#6D7D73] dark:text-[#A3B9B0]"
           >
             {report.location
               .source ===
@@ -902,7 +902,7 @@ function ReportCard({
             color="#64748B"
           />
 
-          <Text className="ml-2 text-xs text-slate-500 dark:text-[#A3B9B0]">
+          <Text className="ml-2 text-xs text-[#6D7D73] dark:text-[#A3B9B0]">
             {formatDate(
               report.createdAt
             )}

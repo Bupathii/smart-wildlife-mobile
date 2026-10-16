@@ -1,5 +1,8 @@
 import { useCallback, useState } from "react";
 import { Image, Pressable, RefreshControl, ScrollView, Text, View, ActivityIndicator } from "react-native";
+import { HeroPanel } from "@/components/premium/HeroPanel";
+import { Reveal, SpringPressable } from "@/components/premium/Motion";
+import { SectionHeading } from "@/components/premium/SectionHeading";
 import { router, useFocusEffect, type Href } from "expo-router";
 import { ArrowUpRight, BellRing, ChevronRight, ClipboardCheck, CloudOff, Compass,
   FilePlus2, FileText, LocateFixed, Map, RadioTower, RefreshCw, ShieldCheck, ShieldAlert, Sprout,
@@ -50,18 +53,24 @@ const configs: Record<Role, { eyebrow: string; heading: string; tagline: string;
   },
 };
 
-function MetricCard({ item }: { item: Metric }) {
-  const { colors } = useAppTheme();
+function MetricCard({ item, index }: { item: Metric; index: number }) {
+  const { colors, dark } = useAppTheme();
   const Icon = item.icon;
   return (
-    <View style={{ flexBasis: "47%", flexGrow: 1, padding: 16, borderRadius: 20, backgroundColor: colors.surface,
-      borderColor: colors.border, borderWidth: 1, minHeight: 143 }}>
-      <View style={{ width: 34, height: 34, borderRadius: 11, backgroundColor: colors.softGreen,
-        justifyContent: "center", alignItems: "center" }}><Icon size={18} color={colors.primary} /></View>
-      <Text style={{ color: colors.text, fontSize: 28, fontWeight: "800", marginTop: 11 }}>{item.value}</Text>
-      <Text style={{ color: colors.text, fontSize: 12, fontWeight: "700", marginTop: 2 }}>{item.label}</Text>
-      <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 11, marginTop: 3 }}>{item.detail}</Text>
-    </View>
+    <Reveal delay={60 + index * 75} style={{ width: "47%", flexGrow: 1 }}>
+      <View style={{ borderRadius: 22, padding: 16, minHeight: 156, backgroundColor: colors.surface,
+        borderWidth: 1, borderColor: colors.border, shadowColor: colors.shadow,
+        shadowOpacity: dark ? 0 : .055, shadowRadius: 14, shadowOffset: { width: 0, height: 5 }, elevation: dark ? 0 : 2 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ width: 39, height: 39, borderRadius: 14, backgroundColor: colors.softGreen,
+            alignItems: "center", justifyContent: "center" }}><Icon color={colors.primary} size={20} strokeWidth={2} /></View>
+          <View style={{ height: 5, width: 20, borderRadius: 3, backgroundColor: colors.accent, opacity: .7 }} />
+        </View>
+        <Text numberOfLines={1} style={{ fontSize: 30, marginTop: 12, fontWeight: "900", color: colors.text, letterSpacing: -1.1 }}>{item.value}</Text>
+        <Text numberOfLines={2} style={{ color: colors.text, fontSize: 12.5, lineHeight: 17, fontWeight: "800", marginTop: 4 }}>{item.label}</Text>
+        <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 10.5, marginTop: 5 }}>{item.detail}</Text>
+      </View>
+    </Reveal>
   );
 }
 
@@ -127,63 +136,71 @@ export default function RoleDashboard({ role }: { role: Role }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void load(true)} tintColor={colors.primary} />}
-        contentContainerStyle={{ paddingHorizontal: 19, paddingTop: 20, paddingBottom: 44 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 17 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Image source={require("../../assets/brand/wildsentinel-mark.png")} style={{ width: 37, height: 38 }} resizeMode="contain" />
-            <View><Text style={{ fontSize: 19, fontWeight: "900", letterSpacing: -0.6, color: colors.text }}>Wild<Text style={{ color: colors.accent }}>Sentinel</Text></Text>
-              <Text style={{ color: colors.muted, fontSize: 10, letterSpacing: 2, fontWeight: "700" }}>CONSERVATION NETWORK</Text></View>
+      <ScrollView showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void load(true)} tintColor={colors.primary} />}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 56 }}>
+        <Reveal style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 23 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1 }}>
+            <View style={{ width: 46, height: 46, borderRadius: 16, alignItems: "center", justifyContent: "center",
+              backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}>
+              <Image source={require("../../assets/brand/wildsentinel-mark.png")} resizeMode="contain" style={{ width: 41, height: 41 }} />
+            </View>
+            <View><Text style={{ fontSize: 21, fontWeight: "900", letterSpacing: -1.1, color: colors.text }}>Wild<Text style={{ color: colors.accent }}>Sentinel</Text></Text>
+              <Text style={{ color: colors.muted, fontSize: 9, letterSpacing: 1.75, fontWeight: "800", marginTop: 2 }}>CONSERVATION INTELLIGENCE</Text></View>
           </View>
           <ThemeToggle compact />
-        </View>
-        <View style={{ backgroundColor: colors.hero, minHeight: 210, padding: 24, borderRadius: 26, overflow: "hidden", position: "relative" }}>
-          <Image source={require("../../assets/brand/wildsentinel-mark.png")} resizeMode="contain"
-            style={{ position: "absolute", width: 190, height: 200, right: -40, bottom: -35, opacity: 0.25 }} />
-          <View style={{ borderRadius: 999, alignSelf: "flex-start", paddingVertical: 6, paddingHorizontal: 12,
-            backgroundColor: "rgba(228,187,115,.18)", marginBottom: 17 }}>
-            <Text style={{ color: "#EEC989", fontSize: 10, letterSpacing: 1.8, fontWeight: "800" }}>{config.eyebrow}</Text>
-          </View>
-          <Text style={{ color: "#FFFFFF", fontSize: 27, fontWeight: "900", maxWidth: "80%", letterSpacing: -0.7 }}>{config.heading}</Text>
-          <Text style={{ color: "#B4D3C6", fontSize: 13, marginTop: 10, maxWidth: "81%", lineHeight: 20 }}>{config.description}</Text>
-          <Text numberOfLines={1} style={{ color: "#EEC989", fontSize: 12, fontWeight: "700", marginTop: 20 }}>Hello, {user?.name || "Wildlife protector"}</Text>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 27, marginBottom: 14 }}>
-          <View><Text style={{ color: colors.text, fontSize: 20, fontWeight: "800" }}>Live overview</Text>
-            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 4 }}>Actual activity from your connected system</Text></View>
-          <Pressable onPress={() => void load(true)} accessibilityLabel="Refresh dashboard" style={{ padding: 10, backgroundColor: colors.surface, borderRadius: 12 }}>
-            <RefreshCw size={19} color={colors.primary} /></Pressable>
-        </View>
-        {busy ? <ActivityIndicator style={{ marginVertical: 35 }} size="large" color={colors.primary} /> : (
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>{metrics.map(m => <MetricCard item={m} key={m.label} />)}</View>
-        )}
-        {!!loadNote && <Text style={{ color: colors.accent, fontSize: 12, marginTop: 10 }}>{loadNote}</Text>}
-        <Text style={{ color: colors.text, fontSize: 20, fontWeight: "800", marginTop: 29, marginBottom: 13 }}>Quick actions</Text>
+        </Reveal>
+        <HeroPanel eyebrow={config.eyebrow} title={config.heading} description={config.description}
+          footer={<View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+            <View style={{ width: 7, height: 7, borderRadius: 5, backgroundColor: "#5CD6A9" }} />
+            <Text numberOfLines={1} style={{ color: "#EBD4A6", fontWeight: "800", fontSize: 12, flex: 1 }}>Welcome, {user?.name || "Wildlife protector"}</Text>
+          </View>} />
+        <Reveal delay={110} style={{ marginTop: 29, marginBottom: 16 }}>
+          <SectionHeading title="At a glance" caption="Your current conservation activity"
+            aside={<SpringPressable onPress={() => void load(true)} accessibilityLabel="Refresh dashboard"
+              style={{ padding: 11, borderRadius: 15, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }}>
+              <RefreshCw size={18} color={colors.primary} /></SpringPressable>} />
+        </Reveal>
+        {busy ? <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 40 }} /> :
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+            {metrics.map((metric, index) => <MetricCard key={metric.label} item={metric} index={index} />)}
+          </View>}
+        {!!loadNote && <View style={{ borderRadius: 13, borderWidth: 1, borderColor: colors.border, padding: 12,
+          backgroundColor: colors.surfaceAlt, marginTop: 12 }}><Text style={{ color: colors.muted, fontSize: 12, lineHeight: 18 }}>{loadNote}</Text></View>}
+        <Reveal delay={160} style={{ marginTop: 32, marginBottom: 15 }}>
+          <SectionHeading title="Your workspace" caption="Every tool, one secure place" />
+        </Reveal>
         <View style={{ gap: 11 }}>
           {config.actions.map((action, index) => {
             const Icon = action.icon;
             return (
-              <Pressable key={action.title} onPress={() => navigate(action.href)}
-                style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 13,
-                  backgroundColor: pressed ? colors.surfaceAlt : colors.surface, borderColor: colors.border,
-                  borderWidth: 1, padding: 15, borderRadius: 19 })}>
-                <View style={{ width: 46, height: 46, alignItems: "center", justifyContent: "center", borderRadius: 15,
-                  backgroundColor: index === 0 ? colors.softGreen : colors.surfaceAlt }}>
-                  <Icon size={22} color={colors.primary} strokeWidth={2} /></View>
-                <View style={{ flex: 1 }}><Text style={{ color: colors.text, fontWeight: "800", fontSize: 14 }}>{action.title}</Text>
-                  <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 12, marginTop: 4 }}>{action.description}</Text></View>
-                <ChevronRight size={18} color={colors.muted} />
-              </Pressable>
+              <Reveal key={action.title} delay={Math.min(85 + index * 55, 360)}>
+                <SpringPressable onPress={() => navigate(action.href)} accessibilityRole="button" accessibilityLabel={action.title}
+                  style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: pressed ? colors.surfaceAlt : colors.surface,
+                    borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16,
+                    shadowColor: colors.shadow, shadowOpacity: dark ? 0 : .035,
+                    shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: dark ? 0 : 1 })}>
+                  <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: index === 0 ? colors.softGreen : colors.surfaceAlt,
+                    justifyContent: "center", alignItems: "center" }}><Icon size={22} color={colors.primary} strokeWidth={1.9} /></View>
+                  <View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 14.5, fontWeight: "800", letterSpacing: -.25 }}>{action.title}</Text>
+                    <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 11.5, marginTop: 5 }}>{action.description}</Text></View>
+                  <View style={{ width: 28, height: 28, borderRadius: 11, alignItems: "center", justifyContent: "center",
+                    backgroundColor: colors.surfaceAlt }}><ChevronRight size={17} color={colors.primary} /></View>
+                </SpringPressable>
+              </Reveal>
             );
           })}
         </View>
-        <View style={{ backgroundColor: colors.softGreen, borderRadius: 20, padding: 18, marginTop: 24,
-          flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
-          <Sprout size={22} color={colors.primary} />
-          <View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 13, fontWeight: "800" }}>{config.tagline}</Text>
-            <Text style={{ color: colors.muted, fontSize: 12, lineHeight: 19, marginTop: 5 }}>{summary || "Reliable field reporting for safer wildlife and communities."}</Text></View>
-          <ArrowUpRight size={17} color={colors.primary} />
-        </View>
+        <Reveal delay={260} style={{ marginTop: 24 }}>
+          <View style={{ backgroundColor: colors.softGreen, borderRadius: 23, padding: 19, flexDirection: "row", gap: 13, alignItems: "flex-start",
+            borderWidth: 1, borderColor: colors.border }}>
+            <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: colors.surface,
+              alignItems: "center", justifyContent: "center" }}><Sprout size={20} color={colors.primary} /></View>
+            <View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 13, fontWeight: "900" }}>{config.tagline}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12, lineHeight: 19, marginTop: 7 }}>{summary || "Reliable field reporting for safer wildlife and communities."}</Text></View>
+          </View>
+        </Reveal>
+        <Text style={{ color: colors.muted, opacity: .75, textAlign: "center", fontSize: 10, marginTop: 26, letterSpacing: 1.2 }}>WILDSENTINEL  •  CONSERVE WITH CONFIDENCE</Text>
       </ScrollView>
     </View>
   );
