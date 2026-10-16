@@ -201,7 +201,7 @@ export default function ConflictLocationScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50 dark:bg-[#081A17]">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -213,11 +213,11 @@ export default function ConflictLocationScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900 dark:text-[#F1F7F1]">
+        <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
           Where did it happen?
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
+        <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
           Capture the location with
           GPS or manually enter an
           approximate location.
@@ -235,7 +235,7 @@ export default function ConflictLocationScreen() {
               selectedSource ===
               "GPS"
                 ? "border-blue-500 bg-blue-50"
-                : "border-slate-200 bg-white"
+                : "border-[#E0E9E2] bg-white"
             }`}
           >
             <View className="flex-row items-center">
@@ -274,7 +274,7 @@ export default function ConflictLocationScreen() {
                   Use GPS Location
                 </Text>
 
-                <Text className="mt-1 text-xs leading-5 text-slate-500 dark:text-[#A3B9B0]">
+                <Text className="mt-1 text-xs leading-5 text-[#6D7D73] dark:text-[#A3B9B0]">
                   Capture your current
                   latitude and longitude
                   automatically.
@@ -310,14 +310,14 @@ export default function ConflictLocationScreen() {
                     </Text>
                   </View>
 
-                  <Text className="mt-3 text-xs text-slate-500 dark:text-[#A3B9B0]">
+                  <Text className="mt-3 text-xs text-[#6D7D73] dark:text-[#A3B9B0]">
                     Latitude:{" "}
                     {latitude.toFixed(
                       6
                     )}
                   </Text>
 
-                  <Text className="mt-1 text-xs text-slate-500 dark:text-[#A3B9B0]">
+                  <Text className="mt-1 text-xs text-[#6D7D73] dark:text-[#A3B9B0]">
                     Longitude:{" "}
                     {longitude.toFixed(
                       6
@@ -346,8 +346,8 @@ export default function ConflictLocationScreen() {
             className={`rounded-2xl border p-5 ${
               selectedSource ===
               "MANUAL"
-                ? "border-teal-500 bg-teal-50"
-                : "border-slate-200 bg-white"
+                ? "border-teal-500 bg-[#E7F5EA]"
+                : "border-[#E0E9E2] bg-white"
             }`}
           >
             <View className="flex-row items-center">
@@ -355,8 +355,8 @@ export default function ConflictLocationScreen() {
                 className={`h-12 w-12 items-center justify-center rounded-xl ${
                   selectedSource ===
                   "MANUAL"
-                    ? "bg-teal-700"
-                    : "bg-teal-50"
+                    ? "bg-[#14785D]"
+                    : "bg-[#E7F5EA]"
                 }`}
               >
                 <PencilLine
@@ -375,7 +375,7 @@ export default function ConflictLocationScreen() {
                   Enter Manually
                 </Text>
 
-                <Text className="mt-1 text-xs leading-5 text-slate-500 dark:text-[#A3B9B0]">
+                <Text className="mt-1 text-xs leading-5 text-[#6D7D73] dark:text-[#A3B9B0]">
                   Enter the village,
                   road, landmark or
                   approximate area.
@@ -415,8 +415,8 @@ export default function ConflictLocationScreen() {
           </Pressable>
         </View>
 
-        <View className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 dark:bg-[#102923] dark:border-[#28493D]">
-          <Text className="text-xs leading-5 text-slate-500 dark:text-[#A3B9B0]">
+        <View className="mt-5 rounded-2xl border border-[#E0E9E2] bg-white p-4 dark:bg-[#102923] dark:border-[#28493D]">
+          <Text className="text-xs leading-5 text-[#6D7D73] dark:text-[#A3B9B0]">
             If GPS is unavailable or
             inaccurate, use the manual
             option and provide enough
@@ -426,12 +426,12 @@ export default function ConflictLocationScreen() {
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-[#E0E9E2] bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           onPress={
             handleContinue
           }
-          className="h-14 items-center justify-center rounded-2xl bg-teal-700"
+          className="h-14 items-center justify-center rounded-2xl bg-[#14785D]"
         >
           <Text className="text-base font-bold text-white">
             Continue

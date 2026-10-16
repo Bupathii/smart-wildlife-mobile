@@ -4,6 +4,9 @@ import { useFocusEffect } from "expo-router";
 import { AlertTriangle, BellRing, MapPin, RadioTower, RefreshCw, ShieldCheck } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useAppTheme } from "@/theme/ThemeContext";
+import { HeroPanel } from "@/components/premium/HeroPanel";
+import { Reveal, SpringPressable } from "@/components/premium/Motion";
+import { SectionHeading } from "@/components/premium/SectionHeading";
 import { getRangerAlerts, type RangerAlert } from "@/services/tracking.service";
 
 export default function LiaisonAlerts() {
@@ -25,17 +28,12 @@ export default function LiaisonAlerts() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, paddingBottom: 50 }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void load(true)} tintColor={colors.primary} />}>
-      <View style={{ borderRadius: 25, backgroundColor: colors.hero, padding: 23, flexDirection: "row", alignItems: "center", gap: 15 }}>
-        <View style={{ width: 51, height: 51, alignItems: "center", justifyContent: "center", backgroundColor: "#27594B", borderRadius: 17 }}>
-          <BellRing color="#EEC989" size={25} /></View>
-        <View style={{ flex: 1 }}><Text style={{ color: "#FFFFFF", fontSize: 21, fontWeight: "900" }}>Wildlife risk alerts</Text>
-          <Text style={{ color: "#C2DBCC", fontSize: 12, lineHeight: 18, marginTop: 5 }}>Monitor animal movement near communities</Text></View>
-      </View>
+      <HeroPanel compact eyebrow="RISK INTELLIGENCE" title="Wildlife risk alerts" description="Monitor animal movement near communities and stay informed of emerging risks." />
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 23, marginBottom: 14 }}>
         <View><Text style={{ color: colors.text, fontSize: 19, fontWeight: "800" }}>Active warnings</Text>
           <Text style={{ color: colors.muted, marginTop: 4, fontSize: 12 }}>Live tracking alerts for your team</Text></View>
-        <Pressable onPress={() => void load(true)} style={{ padding: 10, borderRadius: 12, backgroundColor: colors.surface }}>
-          <RefreshCw size={20} color={colors.primary} /></Pressable>
+        <SpringPressable onPress={() => void load(true)} style={{ padding: 10, borderRadius: 12, backgroundColor: colors.surface }}>
+          <RefreshCw size={20} color={colors.primary} /></SpringPressable>
       </View>
       {loading ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 32 }} /> :
         error ? <Text style={{ color: colors.danger, marginTop: 15 }}>{error}</Text> : active.length === 0 ?
