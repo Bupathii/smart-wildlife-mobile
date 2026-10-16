@@ -208,7 +208,7 @@ export default function EvidenceScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50 dark:bg-[#081A17]">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -219,11 +219,11 @@ export default function EvidenceScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900 dark:text-[#F1F7F1]">
+        <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
           Add supporting evidence
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
+        <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
           Add photos if available.
           Evidence is optional and you
           can continue without adding
@@ -256,10 +256,10 @@ export default function EvidenceScreen() {
             className={`flex-1 rounded-2xl border p-4 ${
               remaining > 0
                 ? "border-teal-200 bg-white"
-                : "border-slate-200 bg-slate-100"
+                : "border-[#E0E9E2] bg-[#EAF1EB]"
             }`}
           >
-            <View className="h-11 w-11 items-center justify-center rounded-xl bg-teal-50 dark:bg-[#1A4839]">
+            <View className="h-11 w-11 items-center justify-center rounded-xl bg-[#E7F5EA] dark:bg-[#1A4839]">
               <Images
                 size={21}
                 color="#0F766E"
@@ -270,7 +270,7 @@ export default function EvidenceScreen() {
               Gallery
             </Text>
 
-            <Text className="mt-1 text-xs leading-4 text-slate-500 dark:text-[#A3B9B0]">
+            <Text className="mt-1 text-xs leading-4 text-[#6D7D73] dark:text-[#A3B9B0]">
               Select one or multiple
               photos
             </Text>
@@ -284,7 +284,7 @@ export default function EvidenceScreen() {
             className={`flex-1 rounded-2xl border p-4 ${
               remaining > 0
                 ? "border-blue-200 bg-white"
-                : "border-slate-200 bg-slate-100"
+                : "border-[#E0E9E2] bg-[#EAF1EB]"
             }`}
           >
             <View className="h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
@@ -298,7 +298,7 @@ export default function EvidenceScreen() {
               Camera
             </Text>
 
-            <Text className="mt-1 text-xs leading-4 text-slate-500 dark:text-[#A3B9B0]">
+            <Text className="mt-1 text-xs leading-4 text-[#6D7D73] dark:text-[#A3B9B0]">
               Capture a new evidence
               photo
             </Text>
@@ -312,7 +312,7 @@ export default function EvidenceScreen() {
             Selected evidence
           </Text>
 
-          <Text className="text-xs font-semibold text-slate-500 dark:text-[#A3B9B0]">
+          <Text className="text-xs font-semibold text-[#6D7D73] dark:text-[#A3B9B0]">
             {draft.evidence.length}/
             {MAX_EVIDENCE}
           </Text>
@@ -323,7 +323,7 @@ export default function EvidenceScreen() {
         {draft.evidence.length ===
           0 && (
           <View className="mt-3 items-center rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 dark:bg-[#102923]">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-[#19382E]">
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-[#EAF1EB] dark:bg-[#19382E]">
               <ImagePlus
                 size={22}
                 color="#64748B"
@@ -354,7 +354,7 @@ export default function EvidenceScreen() {
               ) => (
                 <View
                   key={`${item.uri}-${index}`}
-                  className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-[#102923] dark:border-[#28493D]"
+                  className="relative overflow-hidden rounded-2xl border border-[#E0E9E2] bg-white dark:bg-[#102923] dark:border-[#28493D]"
                   style={{
                     width:
                       "47%",
@@ -402,12 +402,12 @@ export default function EvidenceScreen() {
         )}
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-[#E0E9E2] bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           onPress={
             handleContinue
           }
-          className="h-14 items-center justify-center rounded-2xl bg-teal-700"
+          className="h-14 items-center justify-center rounded-2xl bg-[#14785D]"
         >
           <Text className="text-base font-bold text-white">
             {draft.evidence.length >
