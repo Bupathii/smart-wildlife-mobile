@@ -132,13 +132,13 @@ export default function ReportDetailsScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center bg-[#F2F6F2] dark:bg-[#081A17]">
         <ActivityIndicator
           size="large"
           color="#0F766E"
         />
 
-        <Text className="mt-3 text-sm text-slate-500">
+        <Text className="mt-3 text-sm text-[#6D7D73] dark:text-[#A3B9B0]">
           Loading report...
         </Text>
       </View>
@@ -150,7 +150,7 @@ export default function ReportDetailsScreen() {
     !report
   ) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50 px-6">
+      <View className="flex-1 items-center justify-center bg-[#F2F6F2] px-6 dark:bg-[#081A17]">
         <AlertCircle
           size={40}
           color="#DC2626"
@@ -163,7 +163,7 @@ export default function ReportDetailsScreen() {
 
         <Pressable
           onPress={loadReport}
-          className="mt-5 rounded-xl bg-teal-700 px-5 py-3"
+          className="mt-5 rounded-xl bg-[#14785D] px-5 py-3"
         >
           <Text className="font-bold text-white">
             Try Again
@@ -175,7 +175,7 @@ export default function ReportDetailsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-slate-50"
+      className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]"
       contentContainerStyle={{
         padding: 20,
         paddingBottom: 50,
@@ -279,7 +279,7 @@ export default function ReportDetailsScreen() {
 
       {/* Evidence */}
 
-      <View className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+      <View className="mt-4 rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
         <View className="flex-row items-center">
           <View className="h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
             <ImageIcon
@@ -293,7 +293,7 @@ export default function ReportDetailsScreen() {
               Supporting Evidence
             </Text>
 
-            <Text className="mt-1 text-sm font-bold text-slate-800">
+            <Text className="mt-1 text-sm font-bold text-slate-800 dark:text-[#F1F7F1]">
               {report.evidence?.length ||
                 0}{" "}
               image
@@ -329,7 +329,7 @@ export default function ReportDetailsScreen() {
                       uri:
                         resolveApiAssetUrl(evidence.url),
                     }}
-                    className="h-36 w-36 rounded-xl bg-slate-100"
+                    className="h-36 w-36 rounded-xl bg-[#EAF1EB] dark:bg-[#19382E]"
                     resizeMode="cover"
                   />
                 )
@@ -372,7 +372,7 @@ export default function ReportDetailsScreen() {
       {/* Response */}
 
       {report.response?.note && (
-        <View className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+        <View className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-5 dark:bg-[#1A4839]">
           <View className="flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
               <MessageSquareText
@@ -421,13 +421,13 @@ export default function ReportDetailsScreen() {
         </View>
       )}
 
-      <View className="mt-4 flex-row rounded-2xl border border-slate-200 bg-white p-4">
+      <View className="mt-4 flex-row rounded-2xl border border-[#E0E9E2] bg-white p-4 dark:bg-[#102923] dark:border-[#28493D]">
         <ShieldCheck
           size={19}
           color="#0F766E"
         />
 
-        <Text className="ml-3 flex-1 text-xs leading-5 text-slate-500">
+        <Text className="ml-3 flex-1 text-xs leading-5 text-[#6D7D73] dark:text-[#A3B9B0]">
           Report status and response
           information will update when
           authorized wildlife personnel
@@ -452,9 +452,9 @@ function DetailCard({
   subtitle?: string;
 }) {
   return (
-    <View className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+    <View className="mt-4 rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
       <View className="flex-row items-start">
-        <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50">
+        <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#F2F6F2] dark:bg-[#081A17]">
           <Icon
             size={19}
             color={
@@ -474,7 +474,7 @@ function DetailCard({
             </Text>
           )}
 
-          <Text className="mt-1 text-sm leading-6 text-slate-800">
+          <Text className="mt-1 text-sm leading-6 text-slate-800 dark:text-[#F1F7F1]">
             {value}
           </Text>
         </View>
@@ -489,7 +489,7 @@ function InfoBadge({
   text: string;
 }) {
   return (
-    <View className="rounded-full bg-white/15 px-3 py-1.5">
+    <View className="rounded-full bg-white/15 px-3 py-1.5 dark:bg-[#102923]">
       <Text className="text-[10px] font-bold uppercase text-white">
         {text}
       </Text>
