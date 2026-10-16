@@ -15,6 +15,7 @@ import {
 import {
     router,
 } from "expo-router";
+import { Reveal } from "@/components/premium/Motion";
 
 import {
     useConflictReport,
@@ -110,7 +111,7 @@ export default function ConflictTypeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -122,23 +123,25 @@ export default function ConflictTypeScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900">
+        <Reveal delay={45}>
+        <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
           What happened?
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500">
+        <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
           Select the type of
           human-wildlife conflict you
           want to report.
         </Text>
 
+        </Reveal>
         <StepIndicator
           current={1}
         />
 
         <View className="mt-6 gap-3">
           {conflictTypes.map(
-            (item) => {
+            (item, index) => {
               const selected =
                 draft.conflictType ===
                 item.value;
@@ -147,6 +150,7 @@ export default function ConflictTypeScreen() {
                 item.icon;
 
               return (
+                <Reveal delay={110 + index * 80} key={item.value}>
                 <Pressable
                   key={
                     item.value
@@ -158,8 +162,8 @@ export default function ConflictTypeScreen() {
                   }
                   className={`rounded-2xl border p-4 ${
                     selected
-                      ? "border-teal-500 bg-teal-50"
-                      : "border-slate-200 bg-white"
+                      ? "border-teal-500 bg-[#E7F5EA] dark:border-emerald-500 dark:bg-[#1B4C38]"
+                      : "border-[#E0E9E2] bg-white dark:border-[#28493D] dark:bg-[#102923]"
                   }`}
                 >
                   <View className="flex-row items-center">
@@ -189,8 +193,8 @@ export default function ConflictTypeScreen() {
                       <Text
                         className={`text-base font-bold ${
                           selected
-                            ? "text-teal-900"
-                            : "text-slate-800"
+                            ? "text-teal-900 dark:text-[#E2F9EC]"
+                            : "text-slate-800 dark:text-[#F1F7F1]"
                         }`}
                       >
                         {
@@ -198,7 +202,7 @@ export default function ConflictTypeScreen() {
                         }
                       </Text>
 
-                      <Text className="mt-1 text-xs leading-5 text-slate-500">
+                      <Text className="mt-1 text-xs leading-5 text-[#6D7D73] dark:text-[#A3B9B0]">
                         {
                           item.description
                         }
@@ -215,6 +219,7 @@ export default function ConflictTypeScreen() {
                     />
                   </View>
                 </Pressable>
+                </Reveal>
               );
             }
           )}
@@ -243,7 +248,7 @@ export default function ConflictTypeScreen() {
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-[#E0E9E2] bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           disabled={
             !draft.conflictType
@@ -253,7 +258,7 @@ export default function ConflictTypeScreen() {
           }
           className={`h-14 items-center justify-center rounded-2xl ${
             draft.conflictType
-              ? "bg-teal-700"
+              ? "bg-[#14785D]"
               : "bg-slate-300"
           }`}
         >
@@ -300,7 +305,7 @@ function StepIndicator({
                     className={`h-[2px] flex-1 ${
                       number <=
                       current
-                        ? "bg-teal-500"
+                        ? "bg-[#E7F5EA]0"
                         : "bg-slate-200"
                     }`}
                   />
@@ -309,7 +314,7 @@ function StepIndicator({
                 <View
                   className={`h-7 w-7 items-center justify-center rounded-full ${
                     active
-                      ? "bg-teal-700"
+                      ? "bg-[#14785D]"
                       : "bg-slate-200"
                   }`}
                 >
@@ -317,7 +322,7 @@ function StepIndicator({
                     className={`text-[11px] font-bold ${
                       active
                         ? "text-white"
-                        : "text-slate-500"
+                        : "text-[#6D7D73]"
                     }`}
                   >
                     {number}
@@ -331,7 +336,7 @@ function StepIndicator({
                     className={`h-[2px] flex-1 ${
                       number <
                       current
-                        ? "bg-teal-500"
+                        ? "bg-[#E7F5EA]0"
                         : "bg-slate-200"
                     }`}
                   />
