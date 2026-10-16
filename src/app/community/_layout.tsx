@@ -1,3 +1,5 @@
+import { useAppTheme } from "@/theme/ThemeContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   ClipboardList,
   FilePlus2,
@@ -18,11 +20,10 @@ import {
   usePendingConflictSync,
 } from "@/hooks/usePendingConflictSync";
 
-const ACTIVE_COLOR = "#0F766E";
-const INACTIVE_COLOR = "#64748B";
 
 export default function CommunityLayout() {
   const { user } = useAuth();
+  const { colors, dark } = useAppTheme();
 
   usePendingConflictSync();
 
@@ -45,12 +46,13 @@ export default function CommunityLayout() {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor:
-            "#0F766E",
+          backgroundColor: colors.primaryStrong,
         },
 
         headerTintColor:
           "#FFFFFF",
+
+        headerRight: () => <ThemeToggle compact header />,
 
         headerTitleStyle: {
           fontWeight: "700",
@@ -58,19 +60,19 @@ export default function CommunityLayout() {
         },
 
         tabBarActiveTintColor:
-          ACTIVE_COLOR,
+          colors.primary,
 
         tabBarInactiveTintColor:
-          INACTIVE_COLOR,
+          colors.muted,
 
         tabBarStyle: {
           height: 68,
           paddingTop: 6,
           paddingBottom: 8,
           backgroundColor:
-            "#FFFFFF",
+            colors.surface,
           borderTopColor:
-            "#E2E8F0",
+            colors.border,
           borderTopWidth: 1,
         },
 

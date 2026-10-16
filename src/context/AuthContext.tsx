@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
+  ready: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(
@@ -32,20 +33,29 @@ export function AuthProvider({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   const seenAlertIds = useRef<Set<string> | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-    AsyncStorage.getItem("ranger_token")
-      .then((storedToken) => {
-        if (!storedToken || !isMounted) return;
-        setToken(storedToken);
+    let alive = true;
+    AsyncStorage.multiGet(["ranger_token", "wildsentinel_user"])
+      .then((entries) => {
+        if (!alive) return;
+        const restoredToken = entries[0]?.[1];
+        const restoredUser = entries[1]?.[1];
+        if (restoredToken && restoredUser) {
+          try {
+            const parsed = JSON.parse(restoredUser) as User;
+            if (parsed && parsed.role && parsed.email) {
+              setToken(restoredToken);
+              setUser(parsed);
+            }
+          } catch { /* Stale session: sign in again. */ }
+        }
       })
-      .catch(() => undefined);
-
-    return () => {
-      isMounted = false;
-    };
+      .catch(() => undefined)
+      .finally(() => { if (alive) setReady(true); });
+    return () => { alive = false; };
   }, []);
 
   useEffect(() => {
@@ -98,7 +108,7 @@ export function AuthProvider({
 
     setToken(response.token);
     setUser(response.user);
-    await AsyncStorage.setItem("ranger_token", response.token);
+    await AsyncStorage.multiSet([["ranger_token", response.token], ["wildsentinel_user", JSON.stringify(response.user)]]);
 
     return response.user;
   }
@@ -106,7 +116,7 @@ export function AuthProvider({
   async function logout() {
     setUser(null);
     setToken(null);
-    await AsyncStorage.removeItem("ranger_token");
+    await AsyncStorage.multiRemove(["ranger_token", "wildsentinel_user"]);
   }
 
   return (
@@ -117,6 +127,7 @@ export function AuthProvider({
         login,
         logout,
         isAuthenticated: !!user && !!token,
+        ready,
       }}
     >
       {children}

@@ -351,17 +351,17 @@ export default function RangerTrackingScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-slate-50 px-5 py-6">
-      <Text className="text-3xl font-bold text-slate-900">Wildlife Tracking</Text>
+    <ScrollView className="flex-1 bg-slate-50 px-5 py-6 dark:bg-[#081A17]">
+      <Text className="text-3xl font-bold text-slate-900 dark:text-[#F1F7F1]">Wildlife Tracking</Text>
 
-      <View className="mt-6 rounded-3xl bg-white p-5 shadow-sm border border-slate-200">
+      <View className="mt-6 rounded-3xl bg-white p-5 shadow-sm border border-slate-200 dark:bg-[#102923] dark:border-[#28493D]">
         <Text className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-600">
           Prototype GPS collar
         </Text>
 
         {isRangerController ? (
           <>
-            <Text className="mt-4 text-sm font-semibold text-slate-700">Select animal to track on iPhone</Text>
+            <Text className="mt-4 text-sm font-semibold text-slate-700 dark:text-[#D0E3D9]">Select animal to track on iPhone</Text>
             <View className="mt-2 flex-row flex-wrap gap-2">
               {animals.map((animal) => (
                 <Pressable
@@ -387,7 +387,7 @@ export default function RangerTrackingScreen() {
             )}
           </>
         ) : (
-          <View className="mt-4 rounded-xl bg-emerald-50 p-3">
+          <View className="mt-4 rounded-xl bg-emerald-50 p-3 dark:bg-[#1A4839]">
             <Text className="text-sm font-semibold text-emerald-800">
               {isTracking ? `Sending GPS for ${sessionAnimalName || animalId}` : "iPhone collar standby"}
             </Text>
@@ -398,11 +398,11 @@ export default function RangerTrackingScreen() {
         )}
 
         <View className="mt-4 space-y-3">
-          <Text className="text-base text-slate-700">
-            Animal: <Text className="font-bold text-slate-900">{sessionAnimalName || animalId || "Not selected"}</Text>
+          <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
+            Animal: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{sessionAnimalName || animalId || "Not selected"}</Text>
           </Text>
 
-          <Text className="text-base text-slate-700">
+          <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
             Status: <Text className="font-bold text-emerald-600">
               {isRangerController
                 ? sessionStatus === "ACTIVE"
@@ -418,19 +418,19 @@ export default function RangerTrackingScreen() {
             </Text>
           </Text>
 
-          <Text className="text-base text-slate-700">
-            Latitude: <Text className="font-bold text-slate-900">{latitude ?? "--"}</Text>
+          <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
+            Latitude: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{latitude ?? "--"}</Text>
           </Text>
 
-          <Text className="text-base text-slate-700">
-            Longitude: <Text className="font-bold text-slate-900">{longitude ?? "--"}</Text>
+          <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
+            Longitude: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{longitude ?? "--"}</Text>
           </Text>
 
-          <Text className="text-base text-slate-700">
-            Last Updated: <Text className="font-bold text-slate-900">{updatedAt}</Text>
+          <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
+            Last Updated: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{updatedAt}</Text>
           </Text>
 
-          <Text className="text-sm text-slate-500">
+          <Text className="text-sm text-slate-500 dark:text-[#A3B9B0]">
             User: {user?.name || "Ranger"}
           </Text>
         </View>
@@ -477,7 +477,7 @@ export default function RangerTrackingScreen() {
       </View>
 
       {showMap && isRangerController && latitude !== null && longitude !== null && (
-        <View className="mt-6 h-56 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+        <View className="mt-6 h-56 overflow-hidden rounded-3xl border border-slate-200 bg-white dark:bg-[#102923] dark:border-[#28493D]">
           <LeafletMap latitude={latitude} longitude={longitude} />
         </View>
       )}
@@ -485,7 +485,7 @@ export default function RangerTrackingScreen() {
       {sending && (
         <View className="mt-6 flex-row items-center justify-center gap-2">
           <ActivityIndicator size="small" color="#059669" />
-          <Text className="text-sm text-slate-600">Syncing location to backend...</Text>
+          <Text className="text-sm text-slate-600 dark:text-[#A3B9B0]">Syncing location to backend...</Text>
         </View>
       )}
     </ScrollView>

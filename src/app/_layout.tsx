@@ -4,18 +4,24 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider, useAppTheme } from "@/theme/ThemeContext";
 
-export default function RootLayout() {
+function AppStack() {
+  const { dark, colors } = useAppTheme();
   return (
     <AuthProvider>
-      <StatusBar style="dark" />
+      <StatusBar style={dark ? "light" : "dark"} />
 
       <Stack
         screenOptions={{
           headerShown: false,
           animation: "fade",
+          contentStyle: { backgroundColor: colors.background },
         }}
       />
     </AuthProvider>
   );
+}
+export default function RootLayout() {
+  return <ThemeProvider><AppStack /></ThemeProvider>;
 }

@@ -1,3 +1,6 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import { router } from "expo-router";
+import { ChevronRight, FileWarning, FolderOpen } from "lucide-react-native";
 import {
   Pressable,
   ScrollView,
@@ -5,16 +8,15 @@ import {
   Text,
   View,
 } from "react-native";
-import { router } from "expo-router";
-import { ChevronRight, FileWarning, FolderOpen } from "lucide-react-native";
-import Svg, { Circle, Ellipse, Path, G } from "react-native-svg";
+import Svg, { Circle, Ellipse, G, Path } from "react-native-svg";
 
 /** Simple SVG wildlife silhouette banner matching the green theme */
 function WildlifeBanner() {
+  const themedStyles = useThemedStyles(styles);
   return (
-    <View style={styles.bannerContainer}>
+    <View style={themedStyles.bannerContainer}>
       {/* gradient-ish background */}
-      <View style={styles.bannerBg} />
+      <View style={themedStyles.bannerBg} />
       {/* decorative SVG scene */}
       <Svg
         width="100%"
@@ -81,9 +83,9 @@ function WildlifeBanner() {
       </Svg>
 
       {/* text overlay */}
-      <View style={styles.bannerTextWrap}>
-        <Text style={styles.bannerTitle}>Ranger Dashboard</Text>
-        <Text style={styles.bannerSubtitle}>Wildlife Incident Reporting</Text>
+      <View style={themedStyles.bannerTextWrap}>
+        <Text style={themedStyles.bannerTitle}>Ranger Dashboard</Text>
+        <Text style={themedStyles.bannerSubtitle}>Wildlife Incident Reporting</Text>
       </View>
     </View>
   );
@@ -97,15 +99,16 @@ interface MenuCardProps {
 }
 
 function MenuCard({ icon, title, subtitle, onPress }: MenuCardProps) {
+  const themedStyles = useThemedStyles(styles);
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [themedStyles.card, pressed && themedStyles.cardPressed]}
       onPress={onPress}
     >
-      <View style={styles.cardIconWrap}>{icon}</View>
-      <View style={styles.cardText}>
-        <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardSubtitle}>{subtitle}</Text>
+      <View style={themedStyles.cardIconWrap}>{icon}</View>
+      <View style={themedStyles.cardText}>
+        <Text style={themedStyles.cardTitle}>{title}</Text>
+        <Text style={themedStyles.cardSubtitle}>{subtitle}</Text>
       </View>
       <ChevronRight size={20} color="#0F766E" strokeWidth={2.2} />
     </Pressable>
@@ -113,18 +116,18 @@ function MenuCard({ icon, title, subtitle, onPress }: MenuCardProps) {
 }
 
 export default function IncidentDashboard() {
+  const themedStyles = useThemedStyles(styles);
   return (
-    <View style={styles.root}>
+    <View style={themedStyles.root}>
       {/* decorative circles */}
-      <View style={[styles.circle, styles.circleTopLeft]} />
-      <View style={[styles.circle, styles.circleBottomRight]} />
+      <View style={[themedStyles.circle, themedStyles.circleTopLeft]} />
+      <View style={[themedStyles.circle, themedStyles.circleBottomRight]} />
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={themedStyles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <WildlifeBanner />
-
+       
         <MenuCard
           icon={<FileWarning size={26} color="#0F766E" strokeWidth={2} />}
           title="Report an Incident"

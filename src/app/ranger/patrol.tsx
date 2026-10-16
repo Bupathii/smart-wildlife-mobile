@@ -1,3 +1,4 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
 import {
   ActivityIndicator,
   Alert,
@@ -96,40 +97,43 @@ async function readDevicePosition(): Promise<LocationReport | null> {
 }
 
 function StatTile({ label, value }: { label: string; value: string }) {
+  const themedStyles = useThemedStyles(styles);
   return (
-    <View style={styles.statTile}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={themedStyles.statTile}>
+      <Text style={themedStyles.statValue}>{value}</Text>
+      <Text style={themedStyles.statLabel}>{label}</Text>
     </View>
   );
 }
 
 function ProgressBar({ percentage }: { percentage: number }) {
+  const themedStyles = useThemedStyles(styles);
   return (
-    <View style={styles.progressTrack}>
-      <View style={[styles.progressFill, { width: `${Math.min(100, percentage)}%` }]} />
+    <View style={themedStyles.progressTrack}>
+      <View style={[themedStyles.progressFill, { width: `${Math.min(100, percentage)}%` }]} />
     </View>
   );
 }
 
 function WaypointChecklist({ patrol }: { patrol: MyPatrol }) {
+  const themedStyles = useThemedStyles(styles);
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>
+    <View style={themedStyles.card}>
+      <Text style={themedStyles.cardTitle}>
         Waypoints ({patrol.waypointsReached}/{patrol.waypoints.length})
       </Text>
       {patrol.waypoints.map((waypoint) => (
-        <View key={waypoint.number} style={styles.waypointRow}>
-          <View style={[styles.waypointDot, waypoint.reached && styles.waypointDotReached]}>
-            <Text style={[styles.waypointNumber, waypoint.reached && styles.waypointNumberReached]}>
+        <View key={waypoint.number} style={themedStyles.waypointRow}>
+          <View style={[themedStyles.waypointDot, waypoint.reached && themedStyles.waypointDotReached]}>
+            <Text style={[themedStyles.waypointNumber, waypoint.reached && themedStyles.waypointNumberReached]}>
               {waypoint.reached ? "✓" : waypoint.number}
             </Text>
           </View>
-          <Text style={styles.waypointText}>
+          <Text style={themedStyles.waypointText}>
             Waypoint {waypoint.number} · {waypoint.latitude.toFixed(4)},{" "}
             {waypoint.longitude.toFixed(4)}
           </Text>
-          <Text style={waypoint.reached ? styles.reachedText : styles.pendingText}>
+          <Text style={waypoint.reached ? themedStyles.reachedText : themedStyles.pendingText}>
             {waypoint.reached ? "Reached" : "Pending"}
           </Text>
         </View>
@@ -139,13 +143,14 @@ function WaypointChecklist({ patrol }: { patrol: MyPatrol }) {
 }
 
 function InsightsCard({ data }: { data: MyPatrolResponse }) {
+  const themedStyles = useThemedStyles(styles);
   const { insights, history } = data;
   const last = insights.lastEvaluation;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>My patrol insights</Text>
-      <View style={styles.statGrid}>
+    <View style={themedStyles.card}>
+      <Text style={themedStyles.cardTitle}>My patrol insights</Text>
+      <View style={themedStyles.statGrid}>
         <StatTile label="Patrols completed" value={String(insights.completedPatrols)} />
         <StatTile label="Average coverage" value={`${insights.averageCoverage}%`} />
         <StatTile label="Total distance" value={`${insights.totalDistanceKm} km`} />
@@ -156,28 +161,28 @@ function InsightsCard({ data }: { data: MyPatrolResponse }) {
       </View>
 
       {last && (
-        <View style={styles.feedback}>
-          <Text style={styles.feedbackTitle}>
+        <View style={themedStyles.feedback}>
+          <Text style={themedStyles.feedbackTitle}>
             Latest evaluation · {last.patrolId} · {"★".repeat(last.rating)}
             {"☆".repeat(5 - last.rating)}
           </Text>
-          <Text style={styles.feedbackText}>{last.notes || "No notes were added."}</Text>
+          <Text style={themedStyles.feedbackText}>{last.notes || "No notes were added."}</Text>
         </View>
       )}
 
-      {history.length > 0 && <Text style={styles.subTitle}>Recent patrols</Text>}
+      {history.length > 0 && <Text style={themedStyles.subTitle}>Recent patrols</Text>}
       {history.map((item) => (
-        <View key={item.patrolId} style={styles.historyRow}>
-          <View style={styles.flexOne}>
-            <Text style={styles.historyName}>
+        <View key={item.patrolId} style={themedStyles.historyRow}>
+          <View style={themedStyles.flexOne}>
+            <Text style={themedStyles.historyName}>
               {item.patrolId} · {item.route.name}
             </Text>
-            <Text style={styles.muted}>
+            <Text style={themedStyles.muted}>
               {formatDateTime(item.endTime)} · {formatDuration(item.durationMinutes)} ·{" "}
               {item.distanceCoveredKm} km
             </Text>
           </View>
-          <Text style={styles.historyCoverage}>{item.coveragePercentage}%</Text>
+          <Text style={themedStyles.historyCoverage}>{item.coveragePercentage}%</Text>
         </View>
       ))}
     </View>
@@ -192,6 +197,7 @@ function InsightsCard({ data }: { data: MyPatrolResponse }) {
  * stored and sent later.
  */
 export default function RangerPatrol() {
+  const themedStyles = useThemedStyles(styles);
   const { token } = useAuth();
   const [data, setData] = useState<MyPatrolResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -325,17 +331,17 @@ export default function RangerPatrol() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={themedStyles.centered}>
         <ActivityIndicator size="large" color="#0F766E" />
-        <Text style={styles.muted}>Loading your patrol…</Text>
+        <Text style={themedStyles.muted}>Loading your patrol…</Text>
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
+      style={themedStyles.container}
+      contentContainerStyle={themedStyles.content}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -347,18 +353,18 @@ export default function RangerPatrol() {
       }
     >
       {error !== "" && (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{error}</Text>
-          <Pressable style={styles.secondaryButton} onPress={load}>
-            <Text style={styles.secondaryButtonText}>Try again</Text>
+        <View style={themedStyles.errorBox}>
+          <Text style={themedStyles.errorText}>{error}</Text>
+          <Pressable style={themedStyles.secondaryButton} onPress={load}>
+            <Text style={themedStyles.secondaryButtonText}>Try again</Text>
           </Pressable>
         </View>
       )}
 
       {data && !patrol && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>No patrol assigned</Text>
-          <Text style={styles.muted}>
+        <View style={themedStyles.card}>
+          <Text style={themedStyles.cardTitle}>No patrol assigned</Text>
+          <Text style={themedStyles.muted}>
             {data.ranger.name}, you have no patrol at the moment. When the Park Manager assigns
             one it will appear here. Pull down to refresh.
           </Text>
@@ -367,34 +373,34 @@ export default function RangerPatrol() {
 
       {patrol && (
         <>
-          <View style={styles.card}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.patrolId}>{patrol.patrolId}</Text>
-              <View style={[styles.badge, inProgress && styles.badgeActive]}>
-                <Text style={[styles.badgeText, inProgress && styles.badgeTextActive]}>
+          <View style={themedStyles.card}>
+            <View style={themedStyles.rowBetween}>
+              <Text style={themedStyles.patrolId}>{patrol.patrolId}</Text>
+              <View style={[themedStyles.badge, inProgress && themedStyles.badgeActive]}>
+                <Text style={[themedStyles.badgeText, inProgress && themedStyles.badgeTextActive]}>
                   {STATUS_LABEL[patrol.status]}
                 </Text>
               </View>
             </View>
-            <Text style={styles.routeName}>{patrol.route.name}</Text>
+            <Text style={themedStyles.routeName}>{patrol.route.name}</Text>
             {patrol.route.description !== "" && (
-              <Text style={styles.muted}>{patrol.route.description}</Text>
+              <Text style={themedStyles.muted}>{patrol.route.description}</Text>
             )}
-            <Text style={styles.muted}>
+            <Text style={themedStyles.muted}>
               {inProgress ? "Started" : "Planned start"} {formatDateTime(patrol.startTime)} ·
               planned end {formatDateTime(patrol.endTime)}
             </Text>
-            <Text style={styles.muted}>Team: {patrol.teammates.join(", ")}</Text>
+            <Text style={themedStyles.muted}>Team: {patrol.teammates.join(", ")}</Text>
 
-            <View style={styles.progressBlock}>
-              <View style={styles.rowBetween}>
-                <Text style={styles.progressLabel}>Route progress</Text>
-                <Text style={styles.progressLabel}>{patrol.progressPercentage}%</Text>
+            <View style={themedStyles.progressBlock}>
+              <View style={themedStyles.rowBetween}>
+                <Text style={themedStyles.progressLabel}>Route progress</Text>
+                <Text style={themedStyles.progressLabel}>{patrol.progressPercentage}%</Text>
               </View>
               <ProgressBar percentage={patrol.progressPercentage} />
             </View>
 
-            <View style={styles.statGrid}>
+            <View style={themedStyles.statGrid}>
               <StatTile
                 label="Distance"
                 value={`${patrol.distanceCoveredKm} / ${patrol.route.routeLength} km`}
@@ -409,31 +415,31 @@ export default function RangerPatrol() {
 
             {patrol.status === "PLANNED" && (
               <Pressable
-                style={[styles.primaryButton, busy && styles.disabled]}
+                style={[themedStyles.primaryButton, busy && themedStyles.disabled]}
                 disabled={busy}
                 onPress={() => runAction(startMyPatrol)}
               >
-                <Text style={styles.primaryButtonText}>{busy ? "Starting…" : "Start patrol"}</Text>
+                <Text style={themedStyles.primaryButtonText}>{busy ? "Starting…" : "Start patrol"}</Text>
               </Pressable>
             )}
 
             {inProgress && (
               <>
-                <View style={styles.trackingBox}>
-                  <Text style={styles.trackingText}>
+                <View style={themedStyles.trackingBox}>
+                  <Text style={themedStyles.trackingText}>
                     {tracking.message || "Preparing to send location…"}
                   </Text>
-                  <Text style={styles.muted}>
+                  <Text style={themedStyles.muted}>
                     Last sent {formatClock(tracking.lastSentAt)}
                     {tracking.waiting > 0 ? ` · ${tracking.waiting} waiting to send` : ""}
                   </Text>
-                  <Text style={styles.muted}>Keep this screen open while you are on patrol.</Text>
+                  <Text style={themedStyles.muted}>Keep this screen open while you are on patrol.</Text>
                 </View>
 
-                <View style={styles.rowBetween}>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.switchLabel}>Demo walk</Text>
-                    <Text style={styles.muted}>
+                <View style={themedStyles.rowBetween}>
+                  <View style={themedStyles.flexOne}>
+                    <Text style={themedStyles.switchLabel}>Demo walk</Text>
+                    <Text style={themedStyles.muted}>
                       Sends positions along the route instead of this phone's GPS (for
                       demonstrations away from the park).
                     </Text>
@@ -446,11 +452,11 @@ export default function RangerPatrol() {
                 </View>
 
                 <Pressable
-                  style={[styles.endButton, busy && styles.disabled]}
+                  style={[themedStyles.endButton, busy && themedStyles.disabled]}
                   disabled={busy}
                   onPress={confirmEnd}
                 >
-                  <Text style={styles.primaryButtonText}>{busy ? "Ending…" : "End patrol"}</Text>
+                  <Text style={themedStyles.primaryButtonText}>{busy ? "Ending…" : "End patrol"}</Text>
                 </Pressable>
               </>
             )}

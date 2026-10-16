@@ -1,3 +1,4 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
 import {
   ActivityIndicator,
   Alert,
@@ -47,6 +48,7 @@ function generateId(): string {
 }
 
 export default function IncidentReportScreen() {
+  const themedStyles = useThemedStyles(styles);
   const { token } = useAuth();
 
   /* form state */
@@ -219,7 +221,7 @@ export default function IncidentReportScreen() {
   /* ---- MAP VIEW ---- */
   if (step === "map") {
     return (
-      <View style={styles.mapRoot}>
+      <View style={themedStyles.mapRoot}>
         <MapView
           ref={mapRef}
           style={StyleSheet.absoluteFill}
@@ -241,16 +243,16 @@ export default function IncidentReportScreen() {
           )}
         </MapView>
 
-        <View style={styles.mapBottomSheet}>
-          <Text style={styles.mapHint}>Tap the map to set the incident location</Text>
-          <Pressable style={styles.cancelBtn} onPress={() => setStep("form")}>
-            <Text style={styles.cancelBtnText}>Cancel</Text>
+        <View style={themedStyles.mapBottomSheet}>
+          <Text style={themedStyles.mapHint}>Tap the map to set the incident location</Text>
+          <Pressable style={themedStyles.cancelBtn} onPress={() => setStep("form")}>
+            <Text style={themedStyles.cancelBtnText}>Cancel</Text>
           </Pressable>
         </View>
 
         {markerCoord && (
-          <Pressable style={styles.mapConfirmBtn} onPress={() => setStep("form")}>
-            <Text style={styles.mapConfirmText}>Confirm Location</Text>
+          <Pressable style={themedStyles.mapConfirmBtn} onPress={() => setStep("form")}>
+            <Text style={themedStyles.mapConfirmText}>Confirm Location</Text>
           </Pressable>
         )}
       </View>
@@ -259,31 +261,31 @@ export default function IncidentReportScreen() {
 
   /* ---- FORM VIEW ---- */
   return (
-    <View style={styles.root}>
-      <View style={[styles.circle, styles.circleTopLeft]} />
-      <View style={[styles.circle, styles.circleBottomRight]} />
+    <View style={themedStyles.root}>
+      <View style={[themedStyles.circle, themedStyles.circleTopLeft]} />
+      <View style={[themedStyles.circle, themedStyles.circleBottomRight]} />
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={themedStyles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {/* Incident Type */}
-        <Text style={styles.sectionLabel}>Incident Type</Text>
-        <View style={styles.typeGrid}>
+        <Text style={themedStyles.sectionLabel}>Incident Type</Text>
+        <View style={themedStyles.typeGrid}>
           {INCIDENT_TYPES.map((t) => (
             <Pressable
               key={t.value}
               style={[
-                styles.typeChip,
-                incidentType === t.value && styles.typeChipActive,
+                themedStyles.typeChip,
+                incidentType === t.value && themedStyles.typeChipActive,
               ]}
               onPress={() => setIncidentType(t.value)}
             >
               <Text
                 style={[
-                  styles.typeChipText,
-                  incidentType === t.value && styles.typeChipTextActive,
+                  themedStyles.typeChipText,
+                  incidentType === t.value && themedStyles.typeChipTextActive,
                 ]}
               >
                 {t.label}
@@ -293,21 +295,21 @@ export default function IncidentReportScreen() {
         </View>
 
         {/* Severity */}
-        <Text style={styles.sectionLabel}>Severity</Text>
-        <View style={styles.severityRow}>
+        <Text style={themedStyles.sectionLabel}>Severity</Text>
+        <View style={themedStyles.severityRow}>
           {SEVERITY_OPTIONS.map((s) => (
             <Pressable
               key={s.value}
               style={[
-                styles.severityChip,
-                severity === s.value && styles.severityChipActive,
+                themedStyles.severityChip,
+                severity === s.value && themedStyles.severityChipActive,
               ]}
               onPress={() => setSeverity(s.value as "LOW" | "MEDIUM" | "HIGH")}
             >
               <Text
                 style={[
-                  styles.severityText,
-                  severity === s.value && styles.severityTextActive,
+                  themedStyles.severityText,
+                  severity === s.value && themedStyles.severityTextActive,
                 ]}
               >
                 {s.label}
@@ -317,29 +319,29 @@ export default function IncidentReportScreen() {
         </View>
 
         {/* Location */}
-        <Text style={styles.sectionLabel}>Incident Location</Text>
-        <View style={styles.locationRow}>
-          <Pressable style={styles.locationBtn} onPress={handleGetGPS}>
+        <Text style={themedStyles.sectionLabel}>Incident Location</Text>
+        <View style={themedStyles.locationRow}>
+          <Pressable style={themedStyles.locationBtn} onPress={handleGetGPS}>
             {locatingGPS ? (
               <ActivityIndicator size="small" color="#0F766E" />
             ) : (
               <Navigation size={18} color="#0F766E" strokeWidth={2} />
             )}
-            <Text style={styles.locationBtnText}>Use GPS</Text>
+            <Text style={themedStyles.locationBtnText}>Use GPS</Text>
           </Pressable>
 
           <Pressable
-            style={styles.locationBtn}
+            style={themedStyles.locationBtn}
             onPress={() => setStep("map")}
           >
             <MapPin size={18} color="#0F766E" strokeWidth={2} />
-            <Text style={styles.locationBtnText}>Pin on Map</Text>
+            <Text style={themedStyles.locationBtnText}>Pin on Map</Text>
           </Pressable>
         </View>
 
         {markerCoord && (
-          <View style={styles.coordCard}>
-            <Text style={styles.coordText}>
+          <View style={themedStyles.coordCard}>
+            <Text style={themedStyles.coordText}>
               📍 {markerCoord.latitude.toFixed(5)}, {markerCoord.longitude.toFixed(5)}
             </Text>
             <Pressable onPress={() => setMarkerCoord(null)}>
@@ -349,27 +351,27 @@ export default function IncidentReportScreen() {
         )}
 
         {/* Evidence Photo */}
-        <Text style={styles.sectionLabel}>Evidence Photo</Text>
-        <View style={styles.evidenceBtnRow}>
-          <Pressable style={styles.evidenceBtn} onPress={handleTakePhoto}>
+        <Text style={themedStyles.sectionLabel}>Evidence Photo</Text>
+        <View style={themedStyles.evidenceBtnRow}>
+          <Pressable style={themedStyles.evidenceBtn} onPress={handleTakePhoto}>
             <Camera size={18} color={PRIMARY} strokeWidth={2} />
-            <Text style={styles.evidenceBtnText}>Camera</Text>
+            <Text style={themedStyles.evidenceBtnText}>Camera</Text>
           </Pressable>
-          <Pressable style={[styles.evidenceBtn, styles.evidenceBtnGallery]} onPress={handleSelectFromGallery}>
+          <Pressable style={[themedStyles.evidenceBtn, themedStyles.evidenceBtnGallery]} onPress={handleSelectFromGallery}>
             <Images size={18} color="#166534" strokeWidth={2} />
-            <Text style={[styles.evidenceBtnText, styles.evidenceBtnGalleryText]}>Gallery</Text>
+            <Text style={[themedStyles.evidenceBtnText, themedStyles.evidenceBtnGalleryText]}>Gallery</Text>
           </Pressable>
         </View>
 
         {evidenceUri && (
-          <View style={styles.evidenceThumbContainer}>
+          <View style={themedStyles.evidenceThumbContainer}>
             <Image
               source={{ uri: evidenceUri }}
-              style={styles.evidenceThumb}
+              style={themedStyles.evidenceThumb}
               resizeMode="cover"
             />
             <Pressable
-              style={styles.evidenceRemoveBtn}
+              style={themedStyles.evidenceRemoveBtn}
               onPress={() => setEvidenceUri(null)}
               hitSlop={8}
             >
@@ -379,9 +381,9 @@ export default function IncidentReportScreen() {
         )}
 
         {/* Description */}
-        <Text style={styles.sectionLabel}>Description</Text>
+        <Text style={themedStyles.sectionLabel}>Description</Text>
         <TextInput
-          style={styles.textArea}
+          style={themedStyles.textArea}
           placeholder="Describe what you observed..."
           placeholderTextColor="#94a3b8"
           multiline
@@ -391,18 +393,18 @@ export default function IncidentReportScreen() {
           onChangeText={setDescription}
           maxLength={1500}
         />
-        <Text style={styles.charCount}>{description.length} / 1500</Text>
+        <Text style={themedStyles.charCount}>{description.length} / 1500</Text>
 
         {/* Submit */}
         <Pressable
-          style={[styles.submitBtn, submitting && styles.submitBtnDisabled]}
+          style={[themedStyles.submitBtn, submitting && themedStyles.submitBtnDisabled]}
           onPress={handleSubmit}
           disabled={submitting}
         >
           {submitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitBtnText}>Submit Incident Report</Text>
+            <Text style={themedStyles.submitBtnText}>Submit Incident Report</Text>
           )}
         </Pressable>
       </ScrollView>
