@@ -8,6 +8,8 @@ export default function ReportsLayout() {
   return (
     <Stack
       screenOptions={{
+          animation: "slide_from_right",
+          animationDuration: 230,
         headerStyle: {
           backgroundColor:
             colors.surface,

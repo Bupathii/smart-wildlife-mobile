@@ -1,3 +1,4 @@
+import { View } from "react-native";
 import { useAppTheme } from "@/theme/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -49,31 +50,40 @@ export default function LiaisonLayout() {
 
         headerRight: () => <ThemeToggle compact header />,
 
+        headerShadowVisible: false,
+
         headerTitleStyle: {
-          fontWeight: "700",
-          fontSize: 18,
+          fontWeight: "800",
+          fontSize: 17,
         },
 
         tabBarActiveTintColor:
           colors.primary,
 
+        tabBarHideOnKeyboard: true,
+
         tabBarInactiveTintColor:
           colors.muted,
 
         tabBarStyle: {
-          height: 68,
-          paddingTop: 6,
-          paddingBottom: 8,
+          height: 76,
+          paddingTop: 8,
+          paddingBottom: 9,
           backgroundColor:
             colors.surface,
           borderTopColor:
             colors.border,
           borderTopWidth: 1,
+          elevation: 9,
+          shadowColor: colors.shadow,
+          shadowOpacity: dark ? 0 : 0.09,
+          shadowRadius: 15,
+          shadowOffset: { width: 0, height: -3 },
         },
 
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: "600",
+          fontWeight: "700",
         },
       }}
     >
@@ -88,14 +98,19 @@ export default function LiaisonLayout() {
             "Liaison Dashboard",
 
           tabBarIcon: ({
+            focused,
             color,
             size,
           }) => (
-            <House
+            <View style={{ minWidth: 40, height: 32, borderRadius: 12,
+              backgroundColor: focused ? colors.softGreen : "transparent",
+              alignItems: "center", justifyContent: "center" }}>
+              <House
               color={color}
               size={size}
               strokeWidth={2.2}
             />
+            </View>
           ),
         }}
       />
@@ -116,14 +131,19 @@ export default function LiaisonLayout() {
           popToTopOnBlur: true,
 
           tabBarIcon: ({
+            focused,
             color,
             size,
           }) => (
-            <ClipboardList
+            <View style={{ minWidth: 40, height: 32, borderRadius: 12,
+              backgroundColor: focused ? colors.softGreen : "transparent",
+              alignItems: "center", justifyContent: "center" }}>
+              <ClipboardList
               color={color}
               size={size}
               strokeWidth={2.2}
             />
+            </View>
           ),
         }}
       />
@@ -139,14 +159,19 @@ export default function LiaisonLayout() {
             "Wildlife Risk Alerts",
 
           tabBarIcon: ({
+            focused,
             color,
             size,
           }) => (
-            <BellRing
+            <View style={{ minWidth: 40, height: 32, borderRadius: 12,
+              backgroundColor: focused ? colors.softGreen : "transparent",
+              alignItems: "center", justifyContent: "center" }}>
+              <BellRing
               color={color}
               size={size}
               strokeWidth={2.2}
             />
+            </View>
           ),
         }}
       />
@@ -162,14 +187,19 @@ export default function LiaisonLayout() {
             "Response Activities",
 
           tabBarIcon: ({
+            focused,
             color,
             size,
           }) => (
-            <ShieldCheck
+            <View style={{ minWidth: 40, height: 32, borderRadius: 12,
+              backgroundColor: focused ? colors.softGreen : "transparent",
+              alignItems: "center", justifyContent: "center" }}>
+              <ShieldCheck
               color={color}
               size={size}
               strokeWidth={2.2}
             />
+            </View>
           ),
         }}
       />
@@ -185,14 +215,19 @@ export default function LiaisonLayout() {
             "Liaison Profile",
 
           tabBarIcon: ({
+            focused,
             color,
             size,
           }) => (
-            <UserRound
+            <View style={{ minWidth: 40, height: 32, borderRadius: 12,
+              backgroundColor: focused ? colors.softGreen : "transparent",
+              alignItems: "center", justifyContent: "center" }}>
+              <UserRound
               color={color}
               size={size}
               strokeWidth={2.2}
             />
+            </View>
           ),
         }}
       />

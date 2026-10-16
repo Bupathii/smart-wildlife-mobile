@@ -351,10 +351,10 @@ export default function RangerTrackingScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-slate-50 px-5 py-6 dark:bg-[#081A17]">
-      <Text className="text-3xl font-bold text-slate-900 dark:text-[#F1F7F1]">Wildlife Tracking</Text>
+    <ScrollView className="flex-1 bg-[#F2F6F2] px-5 py-6 dark:bg-[#081A17]">
+      <Text className="text-3xl font-bold text-[#172F28] dark:text-[#F1F7F1]">Wildlife Tracking</Text>
 
-      <View className="mt-6 rounded-3xl bg-white p-5 shadow-sm border border-slate-200 dark:bg-[#102923] dark:border-[#28493D]">
+      <View className="mt-6 rounded-3xl bg-white p-5 shadow-sm border border-[#E0E9E2] dark:bg-[#102923] dark:border-[#28493D]">
         <Text className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-600">
           Prototype GPS collar
         </Text>
@@ -370,8 +370,8 @@ export default function RangerTrackingScreen() {
                   disabled={sessionStatus !== "STOPPED" || sending}
                   className={`rounded-xl border px-3 py-2 ${
                     animalId === animal.animalId
-                      ? "border-emerald-600 bg-emerald-600"
-                      : "border-slate-200 bg-white"
+                      ? "border-emerald-600 bg-[#138769]"
+                      : "border-[#E0E9E2] bg-white"
                   }`}
                 >
                   <Text className={`text-sm font-semibold ${
@@ -399,7 +399,7 @@ export default function RangerTrackingScreen() {
 
         <View className="mt-4 space-y-3">
           <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
-            Animal: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{sessionAnimalName || animalId || "Not selected"}</Text>
+            Animal: <Text className="font-bold text-[#172F28] dark:text-[#F1F7F1]">{sessionAnimalName || animalId || "Not selected"}</Text>
           </Text>
 
           <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
@@ -419,18 +419,18 @@ export default function RangerTrackingScreen() {
           </Text>
 
           <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
-            Latitude: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{latitude ?? "--"}</Text>
+            Latitude: <Text className="font-bold text-[#172F28] dark:text-[#F1F7F1]">{latitude ?? "--"}</Text>
           </Text>
 
           <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
-            Longitude: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{longitude ?? "--"}</Text>
+            Longitude: <Text className="font-bold text-[#172F28] dark:text-[#F1F7F1]">{longitude ?? "--"}</Text>
           </Text>
 
           <Text className="text-base text-slate-700 dark:text-[#D0E3D9]">
-            Last Updated: <Text className="font-bold text-slate-900 dark:text-[#F1F7F1]">{updatedAt}</Text>
+            Last Updated: <Text className="font-bold text-[#172F28] dark:text-[#F1F7F1]">{updatedAt}</Text>
           </Text>
 
-          <Text className="text-sm text-slate-500 dark:text-[#A3B9B0]">
+          <Text className="text-sm text-[#6D7D73] dark:text-[#A3B9B0]">
             User: {user?.name || "Ranger"}
           </Text>
         </View>
@@ -450,7 +450,7 @@ export default function RangerTrackingScreen() {
         <Pressable
           onPress={startTracking}
           disabled={!isRangerController || sessionStatus !== "STOPPED" || sending}
-          className={`rounded-2xl px-5 py-4 ${!isRangerController || sessionStatus !== "STOPPED" || sending ? "bg-emerald-200" : "bg-emerald-600"}`}
+          className={`rounded-2xl px-5 py-4 ${!isRangerController || sessionStatus !== "STOPPED" || sending ? "bg-emerald-200" : "bg-[#138769]"}`}
         >
           <Text className="text-center text-base font-bold text-white">
             {!isRangerController
@@ -477,7 +477,7 @@ export default function RangerTrackingScreen() {
       </View>
 
       {showMap && isRangerController && latitude !== null && longitude !== null && (
-        <View className="mt-6 h-56 overflow-hidden rounded-3xl border border-slate-200 bg-white dark:bg-[#102923] dark:border-[#28493D]">
+        <View className="mt-6 h-56 overflow-hidden rounded-3xl border border-[#E0E9E2] bg-white dark:bg-[#102923] dark:border-[#28493D]">
           <LeafletMap latitude={latitude} longitude={longitude} />
         </View>
       )}

@@ -7,6 +7,7 @@ import { ArrowRight, CheckCircle2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck,
 import { useAuth } from "@/context/AuthContext";
 import { useAppTheme } from "@/theme/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Reveal, SpringPressable } from "@/components/premium/Motion";
 import type { User } from "@/types/auth";
 
 const DEMO_ACCOUNTS = [
@@ -22,6 +23,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
   if (user) return <Redirect href="/" />;
 
@@ -57,8 +59,12 @@ export default function LoginScreen() {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.background }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 23, paddingTop: 24, paddingBottom: 34 }}>
         <View style={{ alignItems: "flex-end" }}><ThemeToggle compact /></View>
-        <View style={{ alignItems: "center", marginTop: 8 }}>
-          <Image source={require("../../../assets/brand/wildsentinel-mark.png")} resizeMode="contain" style={{ width: 124, height: 124 }} />
+        <Reveal delay={55} style={{ alignItems: "center", marginTop: 8 }}>
+          <View style={{ width: 132, height: 132, borderRadius: 42, backgroundColor: colors.surface,
+            alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: colors.border,
+            shadowColor: colors.shadow, shadowOpacity: dark ? 0 : .08, shadowRadius: 23, elevation: 2 }}>
+            <Image source={require("../../../assets/brand/wildsentinel-mark.png")} resizeMode="contain" style={{ width: 112, height: 112 }} />
+          </View>
           <Text style={{ fontSize: 34, fontWeight: "900", letterSpacing: -1.4, color: colors.text, marginTop: 5 }}>
             Wild<Text style={{ color: colors.accent }}>Sentinel</Text>
           </Text>
@@ -68,8 +74,8 @@ export default function LoginScreen() {
           <Text style={{ color: colors.muted, textAlign: "center", lineHeight: 21, maxWidth: 300, fontSize: 13, marginTop: 15 }}>
             Intelligent wildlife conservation and anti-poaching monitoring platform.
           </Text>
-        </View>
-        <View style={{ backgroundColor: colors.surface, borderRadius: 25, padding: 22, marginTop: 27,
+        </Reveal>
+        <Reveal delay={140} style={{ backgroundColor: colors.surface, borderRadius: 25, padding: 22, marginTop: 27,
           borderColor: colors.border, borderWidth: 1, shadowColor: colors.shadow, shadowOpacity: dark ? 0 : 0.06,
           shadowRadius: 14, elevation: 2 }}>
           <Text style={{ fontSize: 23, fontWeight: "800", color: colors.text }}>Welcome back</Text>
@@ -79,27 +85,29 @@ export default function LoginScreen() {
           <Text style={{ color: colors.text, fontSize: 13, fontWeight: "700", marginBottom: 8 }}>Email address</Text>
           <View style={{ justifyContent: "center" }}>
             <Mail size={19} color={colors.muted} style={{ position: "absolute", left: 15, zIndex: 1 }} />
-            <TextInput value={email} onChangeText={setEmail} editable={!anyLoading} autoCapitalize="none"
+            <TextInput value={email} onChangeText={setEmail} onFocus={() => setFocusedField("email")}
+              onBlur={() => setFocusedField(null)} editable={!anyLoading} autoCapitalize="none"
               autoCorrect={false} keyboardType="email-address" placeholder="you@example.com" placeholderTextColor={colors.muted}
-              style={fieldStyle} accessibilityLabel="Email address" />
+              style={[fieldStyle, focusedField === "email" && { borderColor: colors.primary, borderWidth: 1.6 }]} accessibilityLabel="Email address" />
           </View>
           <Text style={{ color: colors.text, fontSize: 13, fontWeight: "700", marginTop: 17, marginBottom: 8 }}>Password</Text>
           <View style={{ justifyContent: "center" }}>
             <LockKeyhole size={19} color={colors.muted} style={{ position: "absolute", left: 15, zIndex: 1 }} />
-            <TextInput value={password} onChangeText={setPassword} editable={!anyLoading}
+            <TextInput value={password} onChangeText={setPassword} onFocus={() => setFocusedField("password")}
+              onBlur={() => setFocusedField(null)} editable={!anyLoading}
               secureTextEntry={!showPassword} autoCapitalize="none" placeholder="Enter your password"
-              placeholderTextColor={colors.muted} style={fieldStyle} accessibilityLabel="Password" />
+              placeholderTextColor={colors.muted} style={[fieldStyle, focusedField === "password" && { borderColor: colors.primary, borderWidth: 1.6 }]} accessibilityLabel="Password" />
             <Pressable accessibilityRole="button" accessibilityLabel={showPassword ? "Hide password" : "Show password"}
               onPress={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: 14, padding: 3 }}>
               {showPassword ? <EyeOff size={19} color={colors.muted} /> : <Eye size={19} color={colors.muted} />}
             </Pressable>
           </View>
-          <Pressable onPress={() => void handleLogin()} disabled={anyLoading}
+          <SpringPressable onPress={() => void handleLogin()} disabled={anyLoading}
             style={{ height: 55, backgroundColor: "#14785D", borderRadius: 15, marginTop: 24, opacity: anyLoading ? 0.6 : 1,
               flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 }}>
             {loading ? <ActivityIndicator color="#FFFFFF" /> : <><Text style={{ color: "#FFFFFF", fontWeight: "800", fontSize: 15 }}>Sign in securely</Text><ArrowRight size={18} color="#FFFFFF" /></>}
-          </Pressable>
-        </View>
+          </SpringPressable>
+        </Reveal>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 25, marginBottom: 16 }}>
           <View style={{ height: 1, backgroundColor: colors.border, flex: 1 }} />
           <Text style={{ color: colors.muted, letterSpacing: 1.4, fontWeight: "800", fontSize: 10 }}>DEMO ACCESS</Text>
@@ -111,7 +119,7 @@ export default function LoginScreen() {
         <View style={{ gap: 9 }}>
           {DEMO_ACCOUNTS.map((account, i) => {
             const Icon = i === 0 ? UsersRound : i === 1 ? MapPinned : ShieldCheck;
-            return <Pressable key={account.role} disabled={anyLoading} onPress={() => void handleDemoLogin(account)}
+            return <SpringPressable key={account.role} disabled={anyLoading} onPress={() => void handleDemoLogin(account)}
               style={({ pressed }) => ({ backgroundColor: pressed ? colors.surfaceAlt : colors.surface, borderColor: colors.border,
                 borderWidth: 1, borderRadius: 17, paddingVertical: 13, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 12, opacity: anyLoading ? .6 : 1 })}>
               <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: colors.softGreen,
@@ -119,7 +127,7 @@ export default function LoginScreen() {
               <View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 13, fontWeight: "800" }}>{account.label}</Text>
                 <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 11, marginTop: 3 }}>{account.email}</Text></View>
               {demoLoading === account.role ? <ActivityIndicator color={colors.primary} /> : <ArrowRight size={17} color={colors.primary} />}
-            </Pressable>;
+            </SpringPressable>;
           })}
         </View>
         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 29 }}>

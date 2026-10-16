@@ -4,6 +4,8 @@ import { LogOut, Mail, ShieldCheck, UserRound, Settings2 } from "lucide-react-na
 import { useAuth } from "@/context/AuthContext";
 import { useAppTheme } from "@/theme/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Reveal, SpringPressable } from "@/components/premium/Motion";
+import { SectionHeading } from "@/components/premium/SectionHeading";
 
 const roleNames: Record<string, string> = {
   RANGER: "Wildlife Ranger", COMMUNITY_MEMBER: "Community Member",
@@ -20,7 +22,7 @@ export default function ProfilePage() {
   }
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 21, paddingBottom: 55 }}>
-      <View style={{ backgroundColor: colors.hero, borderRadius: 25, alignItems: "center", padding: 25, marginBottom: 24 }}>
+      <Reveal style={{ backgroundColor: colors.hero, borderRadius: 27, alignItems: "center", padding: 25, marginBottom: 24, overflow: "hidden" }}>
         <Image source={require("../../assets/brand/wildsentinel-mark.png")} style={{ width: 83, height: 83 }} resizeMode="contain" />
         <Text style={{ fontSize: 17, color: "#FFFFFF", fontWeight: "900", marginTop: 5 }}>Wild<Text style={{ color: "#E4BB73" }}>Sentinel</Text></Text>
         <View style={{ width: 62, height: 62, borderRadius: 21, backgroundColor: "#2C765C",
@@ -29,9 +31,9 @@ export default function ProfilePage() {
         </View>
         <Text style={{ color: "#FFFFFF", fontSize: 22, fontWeight: "800", marginTop: 12 }}>{user?.name || "User"}</Text>
         <Text style={{ color: "#BED8C9", fontSize: 12, marginTop: 5 }}>{roleNames[user?.role || ""] || "Conservation Team"}</Text>
-      </View>
-      <Text style={{ fontSize: 18, color: colors.text, fontWeight: "800", marginBottom: 12 }}>Account details</Text>
-      <View style={{ backgroundColor: colors.surface, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 20 }}>
+      </Reveal>
+      <Reveal delay={95} style={{ marginBottom: 13 }}><SectionHeading title="Account details" caption="Your profile information" /></Reveal>
+      <Reveal delay={130} style={{ backgroundColor: colors.surface, borderRadius: 23, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 20 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}><Mail size={19} color={colors.primary} />
           <View style={{ flex: 1 }}><Text style={{ fontSize: 11, color: colors.muted }}>Email address</Text>
             <Text style={{ marginTop: 5, color: colors.text, fontSize: 14, fontWeight: "700" }}>{user?.email || "—"}</Text></View></View>
@@ -39,18 +41,18 @@ export default function ProfilePage() {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}><ShieldCheck size={19} color={colors.primary} />
           <View style={{ flex: 1 }}><Text style={{ fontSize: 11, color: colors.muted }}>Account role</Text>
             <Text style={{ marginTop: 5, color: colors.text, fontSize: 14, fontWeight: "700" }}>{roleNames[user?.role || ""] || "—"}</Text></View></View>
-      </View>
-      <Text style={{ color: colors.text, fontWeight: "800", fontSize: 18, marginTop: 27, marginBottom: 12 }}>Preferences</Text>
+      </Reveal>
+      <Reveal delay={195} style={{ marginTop: 28, marginBottom: 13 }}><SectionHeading title="Preferences" caption="Make your workspace yours" /></Reveal>
       <View style={{ backgroundColor: colors.surface, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 18,
         flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
         <View style={{ flexDirection: "row", gap: 11, alignItems: "center", flex: 1 }}><Settings2 color={colors.primary} size={20} />
           <View><Text style={{ color: colors.text, fontWeight: "700" }}>App appearance</Text><Text style={{ color: colors.muted, fontSize: 11, marginTop: 4 }}>Switch themes instantly</Text></View></View>
         <ThemeToggle compact />
       </View>
-      <Pressable onPress={handleLogout} style={{ borderRadius: 17, borderWidth: 1, borderColor: colors.border,
+      <SpringPressable onPress={handleLogout} style={{ borderRadius: 17, borderWidth: 1, borderColor: colors.border,
         backgroundColor: colors.surface, height: 54, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center", marginTop: 29 }}>
         <LogOut size={19} color={colors.danger} /><Text style={{ fontWeight: "800", color: colors.danger }}>Sign out</Text>
-      </Pressable>
+      </SpringPressable>
       <Text style={{ color: colors.muted, textAlign: "center", fontSize: 11, marginTop: 24 }}>WildSentinel · Smart Wildlife Conservation</Text>
     </ScrollView>
   );
