@@ -1,18 +1,22 @@
+import { useAppTheme } from "@/theme/ThemeContext";
 import {
     Stack,
 } from "expo-router";
 
 export default function LiaisonConflictLayout() {
+  const { colors } = useAppTheme();
   return (
     <Stack
       screenOptions={{
+          animation: "slide_from_right",
+          animationDuration: 230,
         headerStyle: {
           backgroundColor:
-            "#FFFFFF",
+            colors.surface,
         },
 
         headerTintColor:
-          "#0F172A",
+          colors.text,
 
         headerTitleStyle: {
           fontWeight: "700",

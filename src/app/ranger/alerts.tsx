@@ -187,37 +187,37 @@ export default function RangerAlerts() {
   }, [activeAlerts, alarmEnabled]);
 
   return (
-    <ScrollView className="flex-1 bg-slate-50 px-5 py-6">
-      <Text className="text-3xl font-bold text-slate-900">Wildlife Risk Alerts</Text>
-      <Text className="mt-2 text-sm text-slate-500">
+    <ScrollView className="flex-1 bg-[#F2F6F2] px-5 py-6 dark:bg-[#081A17]">
+      <Text className="text-3xl font-bold text-[#172F28] dark:text-[#F1F7F1]">Wildlife Risk Alerts</Text>
+      <Text className="mt-2 text-sm text-[#6D7D73] dark:text-[#A3B9B0]">
         Ranger assigned alerts refresh from the live backend and can be acknowledged or escalated.
       </Text>
 
       {loading ? (
         <View className="mt-8 flex-row items-center justify-center gap-2">
           <ActivityIndicator size="small" color="#0f172a" />
-          <Text className="text-sm text-slate-600">Loading alerts...</Text>
+          <Text className="text-sm text-slate-600 dark:text-[#A3B9B0]">Loading alerts...</Text>
         </View>
       ) : activeAlerts.length === 0 ? (
-        <View className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white p-5">
-          <Text className="text-base text-slate-500">No active wildlife risk alerts.</Text>
+        <View className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white p-5 dark:bg-[#102923]">
+          <Text className="text-base text-[#6D7D73] dark:text-[#A3B9B0]">No active wildlife risk alerts.</Text>
         </View>
       ) : (
         <View className="mt-6 gap-4">
           {activeAlerts.map((alert) => (
-            <View key={alert.alertId} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+            <View key={alert.alertId} className="rounded-3xl border border-[#E0E9E2] bg-white p-4 shadow-sm dark:bg-[#102923] dark:border-[#28493D]">
               <Text className="text-xs font-bold uppercase tracking-[0.2em] text-red-600">
                 {alert.priority} PRIORITY
               </Text>
-              <Text className="mt-2 text-xl font-bold text-slate-900">{alert.alertId}</Text>
-              <Text className="mt-2 text-sm text-slate-700">Animal: {alert.animalId}</Text>
-              <Text className="text-sm text-slate-700">Zone: {alert.zone}</Text>
-              <Text className="text-sm text-slate-700">
+              <Text className="mt-2 text-xl font-bold text-[#172F28] dark:text-[#F1F7F1]">{alert.alertId}</Text>
+              <Text className="mt-2 text-sm text-slate-700 dark:text-[#D0E3D9]">Animal: {alert.animalId}</Text>
+              <Text className="text-sm text-slate-700 dark:text-[#D0E3D9]">Zone: {alert.zone}</Text>
+              <Text className="text-sm text-slate-700 dark:text-[#D0E3D9]">
                 Location: {alert.latitude}, {alert.longitude}
               </Text>
-              <Text className="mt-2 text-sm font-medium text-slate-800">Status: {alert.status}</Text>
+              <Text className="mt-2 text-sm font-medium text-slate-800 dark:text-[#F1F7F1]">Status: {alert.status}</Text>
 
-              <View className="mt-4 h-36 overflow-hidden rounded-2xl border border-slate-200">
+              <View className="mt-4 h-36 overflow-hidden rounded-2xl border border-[#E0E9E2] dark:border-[#28493D]">
                 <LeafletMap latitude={Number(alert.latitude)} longitude={Number(alert.longitude)} />
               </View>
 
@@ -225,7 +225,7 @@ export default function RangerAlerts() {
                 <Pressable
                   onPress={() => void updateAlert(alert.alertId, "acknowledge")}
                   disabled={busyId === alert.alertId}
-                  className={`rounded-xl px-4 py-3 ${busyId === alert.alertId ? "bg-emerald-200" : "bg-emerald-600"}`}
+                  className={`rounded-xl px-4 py-3 ${busyId === alert.alertId ? "bg-emerald-200" : "bg-[#138769]"}`}
                 >
                   <Text className="text-center text-sm font-bold text-white">ACKNOWLEDGE</Text>
                 </Pressable>

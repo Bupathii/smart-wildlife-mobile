@@ -1,8 +1,10 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { CheckCircle, ClipboardList, ChevronLeft } from "lucide-react-native";
 
 export default function IncidentConfirmScreen() {
+  const themedStyles = useThemedStyles(styles);
   const { syncStatus, serverId, clientIncidentId } = useLocalSearchParams<{
     syncStatus: string;
     serverId?: string;
@@ -13,53 +15,53 @@ export default function IncidentConfirmScreen() {
   const displayId = (serverId || clientIncidentId || "").slice(0, 10);
 
   return (
-    <View style={styles.root}>
+    <View style={themedStyles.root}>
       {/* decorative circles */}
-      <View style={[styles.circle, styles.circleTopLeft]} />
-      <View style={[styles.circle, styles.circleBottomRight]} />
+      <View style={[themedStyles.circle, themedStyles.circleTopLeft]} />
+      <View style={[themedStyles.circle, themedStyles.circleBottomRight]} />
 
       {/* card */}
-      <View style={styles.card}>
+      <View style={themedStyles.card}>
         {/* checkmark icon */}
-        <View style={styles.iconWrap}>
+        <View style={themedStyles.iconWrap}>
           <CheckCircle size={52} color="#16A34A" strokeWidth={1.8} />
         </View>
 
-        <Text style={styles.title}>Report Submitted</Text>
-        <Text style={styles.subtitle}>
+        <Text style={themedStyles.title}>Report Submitted</Text>
+        <Text style={themedStyles.subtitle}>
           {isSynced
             ? "Your incident report has been successfully synchronized with the central database."
             : "Your report has been saved locally and will sync when connected."}
         </Text>
 
         {/* status badge */}
-        <View style={[styles.badge, isSynced ? styles.badgeSynced : styles.badgePending]}>
-          <View style={[styles.dot, isSynced ? styles.dotSynced : styles.dotPending]} />
-          <Text style={[styles.badgeText, isSynced ? styles.badgeTextSynced : styles.badgeTextPending]}>
+        <View style={[themedStyles.badge, isSynced ? themedStyles.badgeSynced : themedStyles.badgePending]}>
+          <View style={[themedStyles.dot, isSynced ? themedStyles.dotSynced : themedStyles.dotPending]} />
+          <Text style={[themedStyles.badgeText, isSynced ? themedStyles.badgeTextSynced : themedStyles.badgeTextPending]}>
             {isSynced ? "Synchronized" : "Pending"}
           </Text>
         </View>
 
         {/* ID */}
         {displayId ? (
-          <Text style={styles.idText}>ID: {displayId}...</Text>
+          <Text style={themedStyles.idText}>ID: {displayId}...</Text>
         ) : null}
 
         {/* actions */}
         <Pressable
-          style={styles.primaryBtn}
+          style={themedStyles.primaryBtn}
           onPress={() => router.push("/ranger/my-incidents")}
         >
           <ClipboardList size={18} color="#fff" strokeWidth={2} />
-          <Text style={styles.primaryBtnText}>My Reports</Text>
+          <Text style={themedStyles.primaryBtnText}>My Reports</Text>
         </Pressable>
 
         <Pressable
-          style={styles.secondaryBtn}
+          style={themedStyles.secondaryBtn}
           onPress={() => router.replace("/ranger/incident")}
         >
           <ChevronLeft size={18} color="#0F766E" strokeWidth={2} />
-          <Text style={styles.secondaryBtnText}>Back to Dashboard</Text>
+          <Text style={themedStyles.secondaryBtnText}>Back to Dashboard</Text>
         </Pressable>
       </View>
     </View>
