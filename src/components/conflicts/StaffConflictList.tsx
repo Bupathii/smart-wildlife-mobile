@@ -204,7 +204,7 @@ export default function StaffConflictList({
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -231,11 +231,11 @@ export default function StaffConflictList({
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900">
+        <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
           Conflict Reports
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500">
+        <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
           Review community
           human-wildlife conflict
           reports and coordinate an
@@ -268,8 +268,8 @@ export default function StaffConflictList({
                     }
                     className={`rounded-full px-4 py-2.5 ${
                       selected
-                        ? "bg-teal-700"
-                        : "border border-slate-200 bg-white"
+                        ? "bg-[#14785D]"
+                        : "border border-[#E0E9E2] bg-white"
                     }`}
                   >
                     <Text
@@ -297,7 +297,7 @@ export default function StaffConflictList({
               color="#0F766E"
             />
 
-            <Text className="mt-3 text-sm text-slate-500">
+            <Text className="mt-3 text-sm text-[#6D7D73] dark:text-[#A3B9B0]">
               Loading reports...
             </Text>
           </View>
@@ -332,13 +332,13 @@ export default function StaffConflictList({
           !error &&
           reports.length ===
             0 && (
-            <View className="mt-6 items-center rounded-2xl border border-slate-200 bg-white p-10">
+            <View className="mt-6 items-center rounded-2xl border border-[#E0E9E2] bg-white p-10 dark:bg-[#102923] dark:border-[#28493D]">
               <FileText
                 size={30}
                 color="#64748B"
               />
 
-              <Text className="mt-4 font-bold text-slate-800">
+              <Text className="mt-4 font-bold text-slate-800 dark:text-[#F1F7F1]">
                 No conflict reports
               </Text>
             </View>
@@ -358,11 +358,11 @@ export default function StaffConflictList({
                         report._id
                       )
                     }
-                    className="rounded-2xl border border-slate-200 bg-white p-5"
+                    className="rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]"
                   >
                     <View className="flex-row items-start">
                       <View className="flex-1">
-                        <Text className="text-base font-bold text-slate-900">
+                        <Text className="text-base font-bold text-[#172F28] dark:text-[#F1F7F1]">
                           {getTypeLabel(
                             report.conflictType
                           )}
@@ -385,7 +385,7 @@ export default function StaffConflictList({
                       numberOfLines={
                         2
                       }
-                      className="mt-3 text-sm leading-5 text-slate-500"
+                      className="mt-3 text-sm leading-5 text-[#6D7D73] dark:text-[#A3B9B0]"
                     >
                       {
                         report.description
@@ -403,7 +403,7 @@ export default function StaffConflictList({
                           numberOfLines={
                             1
                           }
-                          className="ml-2 flex-1 text-xs text-slate-500"
+                          className="ml-2 flex-1 text-xs text-[#6D7D73] dark:text-[#A3B9B0]"
                         >
                           {report
                             .location
@@ -426,7 +426,7 @@ export default function StaffConflictList({
                           color="#64748B"
                         />
 
-                        <Text className="ml-2 text-xs text-slate-500">
+                        <Text className="ml-2 text-xs text-[#6D7D73] dark:text-[#A3B9B0]">
                           {new Date(
                             report.createdAt
                           ).toLocaleString()}
