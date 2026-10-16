@@ -284,7 +284,7 @@ export default function ReviewScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-[#F2F6F2] dark:bg-[#081A17]">
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -295,11 +295,11 @@ export default function ReviewScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900">
+        <Text className="text-[26px] font-bold text-[#172F28] dark:text-[#F1F7F1]">
           Review your report
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500">
+        <Text className="mt-2 text-sm leading-6 text-[#6D7D73] dark:text-[#A3B9B0]">
           Check the information below
           before submitting it to
           wildlife personnel.
@@ -372,7 +372,7 @@ export default function ReviewScreen() {
 
         {/* Evidence */}
 
-        <View className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+        <View className="mt-4 rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
           <View className="flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
               <ImageIcon
@@ -386,7 +386,7 @@ export default function ReviewScreen() {
                 Supporting Evidence
               </Text>
 
-              <Text className="mt-1 text-sm font-bold text-slate-800">
+              <Text className="mt-1 text-sm font-bold text-slate-800 dark:text-[#F1F7F1]">
                 {
                   draft.evidence
                     .length
@@ -406,7 +406,7 @@ export default function ReviewScreen() {
                   "/community/report/evidence"
                 )
               }
-              className="h-9 w-9 items-center justify-center rounded-full bg-slate-100"
+              className="h-9 w-9 items-center justify-center rounded-full bg-[#EAF1EB] dark:bg-[#19382E]"
             >
               <Pencil
                 size={16}
@@ -436,7 +436,7 @@ export default function ReviewScreen() {
                         uri:
                           item.uri,
                       }}
-                      className="h-24 w-24 rounded-xl bg-slate-100"
+                      className="h-24 w-24 rounded-xl bg-[#EAF1EB] dark:bg-[#19382E]"
                       resizeMode="cover"
                     />
                   )
@@ -457,13 +457,13 @@ export default function ReviewScreen() {
 
         {/* Information */}
 
-        <View className="mt-5 flex-row rounded-2xl border border-teal-100 bg-teal-50 p-4">
+        <View className="mt-5 flex-row rounded-2xl border border-teal-100 bg-[#E7F5EA] p-4 dark:bg-[#1A4839] dark:border-[#28493D]">
           <ShieldCheck
             size={20}
             color="#0F766E"
           />
 
-          <Text className="ml-3 flex-1 text-xs leading-5 text-teal-800">
+          <Text className="ml-3 flex-1 text-xs leading-5 text-teal-800 dark:text-[#7DDDB9]">
             When online, your report
             will be sent immediately to
             authorized wildlife
@@ -478,7 +478,7 @@ export default function ReviewScreen() {
 
       {/* Bottom Submit Button */}
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-[#E0E9E2] bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           onPress={
             handleSubmit
@@ -488,8 +488,8 @@ export default function ReviewScreen() {
           }
           className={`h-14 flex-row items-center justify-center rounded-2xl ${
             submitting
-              ? "bg-teal-500"
-              : "bg-teal-700"
+              ? "bg-[#E7F5EA]0"
+              : "bg-[#14785D]"
           }`}
         >
           {submitting ? (
@@ -542,9 +542,9 @@ function ReviewCard({
   onEdit: () => void;
 }) {
   return (
-    <View className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+    <View className="mt-4 rounded-2xl border border-[#E0E9E2] bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
       <View className="flex-row items-start">
-        <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50">
+        <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#F2F6F2] dark:bg-[#081A17]">
           <Icon
             size={19}
             color={
@@ -566,14 +566,14 @@ function ReviewCard({
             </Text>
           )}
 
-          <Text className="mt-1 text-sm leading-6 text-slate-800">
+          <Text className="mt-1 text-sm leading-6 text-slate-800 dark:text-[#F1F7F1]">
             {value}
           </Text>
         </View>
 
         <Pressable
           onPress={onEdit}
-          className="h-9 w-9 items-center justify-center rounded-full bg-slate-100"
+          className="h-9 w-9 items-center justify-center rounded-full bg-[#EAF1EB] dark:bg-[#19382E]"
         >
           <Pencil
             size={16}

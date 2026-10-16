@@ -1,3 +1,7 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import { Reveal } from "@/components/premium/Motion";
+import { SectionHeading } from "@/components/premium/SectionHeading";
+import { FileText, ShieldCheck } from "lucide-react-native";
 import {
   ActivityIndicator,
   Alert,
@@ -52,6 +56,7 @@ function ReportCard({
   report: PendingIncidentReport;
   onDelete: (id: string) => void;
 }) {
+  const themedStyles = useThemedStyles(styles);
   const ss = statusStyle(report.syncStatus);
   const dateStr = report.createdAt
     ? new Date(report.createdAt).toISOString().slice(0, 10)
@@ -73,31 +78,31 @@ function ReportCard({
   }
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={styles.cardLeft}>
-          <Text style={styles.cardTitle}>
+    <View style={themedStyles.card}>
+      <View style={themedStyles.cardTop}>
+        <View style={themedStyles.cardLeft}>
+          <Text style={themedStyles.cardTitle}>
             {INCIDENT_LABELS[report.incidentType] ?? report.incidentType}
           </Text>
-          <Text style={styles.cardDate}>{dateStr}</Text>
+          <Text style={themedStyles.cardDate}>{dateStr}</Text>
           {report.description ? (
-            <Text style={styles.cardDesc} numberOfLines={1}>
+            <Text style={themedStyles.cardDesc} numberOfLines={1}>
               {report.description}
             </Text>
           ) : null}
         </View>
 
         {/* Status badge + delete button stacked on the right */}
-        <View style={styles.cardRight}>
-          <View style={[styles.badge, ss.badge]}>
-            <View style={[styles.dot, ss.dot]} />
-            <Text style={[styles.badgeText, ss.text]}>
+        <View style={themedStyles.cardRight}>
+          <View style={[themedStyles.badge, ss.badge]}>
+            <View style={[themedStyles.dot, ss.dot]} />
+            <Text style={[themedStyles.badgeText, ss.text]}>
               {report.syncStatus === "Synchronized" ? "Synchronized" : "Pending"}
             </Text>
           </View>
 
           <Pressable
-            style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.65 }]}
+            style={({ pressed }) => [themedStyles.deleteBtn, pressed && { opacity: 0.65 }]}
             onPress={handleDeletePress}
             hitSlop={8}
             accessibilityLabel="Delete report"
@@ -112,6 +117,7 @@ function ReportCard({
 }
 
 export default function MyIncidentsScreen() {
+  const themedStyles = useThemedStyles(styles);
   const { token } = useAuth();
   const [reports, setReports] = useState<PendingIncidentReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,23 +212,31 @@ export default function MyIncidentsScreen() {
   }, [loadReports]);
 
   return (
-    <View style={styles.root}>
-      <View style={[styles.circle, styles.circleTopLeft]} />
-      <View style={[styles.circle, styles.circleBottomRight]} />
+    <View style={themedStyles.root}>
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={themedStyles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#0F766E" />
         }
       >
-        <Text style={styles.pageTitle}>My Incident Reports</Text>
+        <Reveal style={{ marginBottom: 9 }}>
+          <View style={{ backgroundColor: "#103D33", borderRadius: 23, paddingHorizontal: 21, paddingVertical: 22 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 12 }}>
+              <ShieldCheck size={16} color="#E8BE79" />
+              <Text style={{ color: "#E8BE79", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 }}>YOUR FIELD RECORDS</Text>
+            </View>
+            <Text style={{ fontSize: 23, fontWeight: "900", color: "#FFFFFF", letterSpacing: -.5 }}>Incident history</Text>
+            <Text style={{ color: "#BFDACD", fontSize: 12, marginTop: 7, lineHeight: 18 }}>Review reports saved on this device and synchronize them when connected.</Text>
+          </View>
+        </Reveal>
+        <View style={{ marginTop: 11, marginBottom: 5 }}><SectionHeading title="Your reports" caption={`${reports.length} stored ${reports.length === 1 ? "report" : "reports"}`} /></View>
 
         {/* Sync button */}
         <Pressable
           style={({ pressed }) => [
-            styles.syncBtn,
+            themedStyles.syncBtn,
             pressed && { opacity: 0.8 },
           ]}
           onPress={handleSync}
@@ -233,7 +247,7 @@ export default function MyIncidentsScreen() {
           ) : (
             <RefreshCw size={18} color="#0F766E" strokeWidth={2} />
           )}
-          <Text style={styles.syncBtnText}>
+          <Text style={themedStyles.syncBtnText}>
             {syncing ? "Syncing..." : "Sync Pending Reports"}
           </Text>
         </Pressable>
@@ -246,9 +260,9 @@ export default function MyIncidentsScreen() {
             style={{ marginTop: 40 }}
           />
         ) : reports.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>No incident reports yet.</Text>
-            <Text style={styles.emptySubtext}>
+          <View style={themedStyles.empty}>
+            <Text style={themedStyles.emptyText}>No incident reports yet.</Text>
+            <Text style={themedStyles.emptySubtext}>
               Submit your first report from the Report Incident tab.
             </Text>
           </View>

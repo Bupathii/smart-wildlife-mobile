@@ -1,16 +1,20 @@
+import { useAppTheme } from "@/theme/ThemeContext";
 import {
     Stack,
 } from "expo-router";
 
 export default function RangerConflictLayout() {
+  const { colors } = useAppTheme();
   return (
     <Stack
       screenOptions={{
+          animation: "slide_from_right",
+          animationDuration: 230,
         headerStyle: {
-          backgroundColor: "#FFFFFF",
+          backgroundColor: colors.surface,
         },
 
-        headerTintColor: "#0F172A",
+        headerTintColor: colors.text,
 
         headerTitleStyle: {
           fontWeight: "700",
@@ -19,7 +23,7 @@ export default function RangerConflictLayout() {
         headerShadowVisible: false,
 
         contentStyle: {
-          backgroundColor: "#F8FAFC",
+          backgroundColor: colors.background,
         },
       }}
     >
