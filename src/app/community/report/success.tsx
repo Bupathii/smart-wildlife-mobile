@@ -66,7 +66,7 @@ export default function SuccessScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50 px-5">
+    <View className="flex-1 bg-slate-50 px-5 dark:bg-[#081A17]">
       <View className="flex-1 items-center justify-center">
         {/* Icon */}
 
@@ -102,7 +102,7 @@ export default function SuccessScreen() {
 
         {/* Title */}
 
-        <Text className="mt-7 text-center text-[27px] font-bold text-slate-900">
+        <Text className="mt-7 text-center text-[27px] font-bold text-slate-900 dark:text-[#F1F7F1]">
           {savedOffline
             ? "Report saved offline"
             : "Report submitted"}
@@ -110,7 +110,7 @@ export default function SuccessScreen() {
 
         {/* Description */}
 
-        <Text className="mt-3 max-w-sm text-center text-sm leading-6 text-slate-500">
+        <Text className="mt-3 max-w-sm text-center text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
           {savedOffline
             ? "Internet access is currently unavailable. Your report has been stored safely on this device and will synchronize automatically when connectivity returns."
             : "Your human-wildlife conflict report has been submitted successfully and is available for wildlife personnel to review."}
@@ -146,14 +146,14 @@ export default function SuccessScreen() {
 
         {reportId &&
           !savedOffline && (
-            <View className="mt-6 w-full rounded-2xl border border-slate-200 bg-white p-5">
+            <View className="mt-6 w-full rounded-2xl border border-slate-200 bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
               <Text className="text-center text-xs font-semibold text-slate-400">
                 Report Reference
               </Text>
 
               <Text
                 numberOfLines={1}
-                className="mt-2 text-center text-sm font-bold text-slate-700"
+                className="mt-2 text-center text-sm font-bold text-slate-700 dark:text-[#D0E3D9]"
               >
                 {reportId}
               </Text>
@@ -204,14 +204,14 @@ export default function SuccessScreen() {
           onPress={
             handleMyReports
           }
-          className="mt-3 h-14 flex-row items-center justify-center rounded-2xl border border-teal-200 bg-teal-50"
+          className="mt-3 h-14 flex-row items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 dark:bg-[#1A4839]"
         >
           <ClipboardList
             size={19}
             color="#0F766E"
           />
 
-          <Text className="ml-2 text-base font-bold text-teal-800">
+          <Text className="ml-2 text-base font-bold text-teal-800 dark:text-[#7DDDB9]">
             View My Reports
           </Text>
         </Pressable>
@@ -220,14 +220,14 @@ export default function SuccessScreen() {
           onPress={
             handleHome
           }
-          className="mt-3 h-14 flex-row items-center justify-center rounded-2xl border border-slate-200 bg-white"
+          className="mt-3 h-14 flex-row items-center justify-center rounded-2xl border border-slate-200 bg-white dark:bg-[#102923] dark:border-[#28493D]"
         >
           <Home
             size={19}
             color="#475569"
           />
 
-          <Text className="ml-2 text-base font-bold text-slate-700">
+          <Text className="ml-2 text-base font-bold text-slate-700 dark:text-[#D0E3D9]">
             Back to Home
           </Text>
         </Pressable>

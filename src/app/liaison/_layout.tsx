@@ -1,3 +1,5 @@
+import { useAppTheme } from "@/theme/ThemeContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   BellRing,
   ClipboardList,
@@ -15,11 +17,10 @@ import {
   useAuth,
 } from "@/context/AuthContext";
 
-const ACTIVE_COLOR = "#0F766E";
-const INACTIVE_COLOR = "#64748B";
 
 export default function LiaisonLayout() {
   const { user } = useAuth();
+  const { colors, dark } = useAppTheme();
 
   if (!user) {
     return (
@@ -40,12 +41,13 @@ export default function LiaisonLayout() {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor:
-            "#0F766E",
+          backgroundColor: colors.primaryStrong,
         },
 
         headerTintColor:
           "#FFFFFF",
+
+        headerRight: () => <ThemeToggle compact header />,
 
         headerTitleStyle: {
           fontWeight: "700",
@@ -53,19 +55,19 @@ export default function LiaisonLayout() {
         },
 
         tabBarActiveTintColor:
-          ACTIVE_COLOR,
+          colors.primary,
 
         tabBarInactiveTintColor:
-          INACTIVE_COLOR,
+          colors.muted,
 
         tabBarStyle: {
           height: 68,
           paddingTop: 6,
           paddingBottom: 8,
           backgroundColor:
-            "#FFFFFF",
+            colors.surface,
           borderTopColor:
-            "#E2E8F0",
+            colors.border,
           borderTopWidth: 1,
         },
 

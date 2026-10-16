@@ -60,7 +60,7 @@ export default function ConflictDetailsScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-50 dark:bg-[#081A17]">
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -72,18 +72,18 @@ export default function ConflictDetailsScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900">
+        <Text className="text-[26px] font-bold text-slate-900 dark:text-[#F1F7F1]">
           Tell us what happened
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500">
+        <Text className="mt-2 text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
           Provide clear information
           that can help wildlife
           personnel understand the
           situation.
         </Text>
 
-        <View className="mt-7 rounded-2xl border border-slate-200 bg-white p-5">
+        <View className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 dark:bg-[#102923] dark:border-[#28493D]">
           <View className="flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
               <FileText
@@ -93,7 +93,7 @@ export default function ConflictDetailsScreen() {
             </View>
 
             <View className="ml-3">
-              <Text className="text-sm font-bold text-slate-800">
+              <Text className="text-sm font-bold text-slate-800 dark:text-[#F1F7F1]">
                 Conflict description
               </Text>
 
@@ -119,7 +119,7 @@ export default function ConflictDetailsScreen() {
             textAlignVertical="top"
             placeholder="Example: An elephant was seen close to houses near the village road..."
             placeholderTextColor="#94A3B8"
-            className="mt-4 min-h-40 rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-800"
+            className="mt-4 min-h-40 rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-800 dark:bg-[#081A17] dark:text-[#F1F7F1] dark:border-[#28493D]"
           />
 
           <Text className="mt-2 text-right text-xs text-slate-400">
@@ -145,7 +145,7 @@ export default function ConflictDetailsScreen() {
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           onPress={
             handleContinue

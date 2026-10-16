@@ -1,18 +1,20 @@
+import { useAppTheme } from "@/theme/ThemeContext";
 import {
     Stack,
 } from "expo-router";
 
 export default function LiaisonConflictLayout() {
+  const { colors } = useAppTheme();
   return (
     <Stack
       screenOptions={{
         headerStyle: {
           backgroundColor:
-            "#FFFFFF",
+            colors.surface,
         },
 
         headerTintColor:
-          "#0F172A",
+          colors.text,
 
         headerTitleStyle: {
           fontWeight: "700",

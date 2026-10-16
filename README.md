@@ -1,4 +1,25 @@
-# Mobile — Smart Wildlife Conservation App
+# WildSentinel — Mobile App (UI Enhancement Release)
+
+This source is the existing Expo SDK 57 wildlife conservation mobile app enhanced with
+WildSentinel branding, a persistent native light/dark toggle, polished sign-in and
+profile screens, API-backed role dashboards and accessible quick actions. Existing
+community conflict reports, ranger patrols, wildlife tracking, alerts and offline
+incident submissions remain in their original route/service locations.
+
+**Backend is not included or replaced in this app-only ZIP.** The archive deliberately
+excludes `.env`, `.git`, `.expo`, `node_modules` and local caches; when overlaid onto
+the original `MyApp` folder, its existing `.env` and Git history remain intact.
+
+**Manual verification required:** Run `npm ci`, `npx tsc --noEmit` and
+`npx expo start --clear` on a network-connected developer computer. API-backed
+metrics display `—` when the backend is unavailable; they do not invent values.
+The Liaison Alerts tab is read-only because the backend reserves alert management
+actions for authorized ranger roles. The Responses tab lists current cases from
+the existing conflict-report API.
+
+---
+
+# Original Application Reference
 
 Expo Router + React Native (TypeScript) app for the two field-facing roles that don't use the [web dashboard](../../frontend/smart-wildlife-frontend): `COMMUNITY_MEMBER` (reports human–wildlife conflicts) and `RANGER` / `COMMUNITY_LIAISON_OFFICER` (respond to those reports). See `AGENTS.md`/`CLAUDE.md` for Expo-version-specific coding rules — this file covers what the app actually does.
 
@@ -9,7 +30,7 @@ npm install
 npx expo start
 ```
 
-No `.env` file exists yet. The API base URL comes from `EXPO_PUBLIC_API_URL` (`src/services/api.ts`), falling back to:
+Your local `.env` is preserved when applying the ZIP to your existing `MyApp` directory. The API base URL comes from `EXPO_PUBLIC_API_URL` (`src/services/api.ts`), falling back to:
 - `http://10.0.2.2:5000/api` on Android (emulator's alias for the host machine)
 - `http://localhost:5000/api` on iOS
 
@@ -28,7 +49,7 @@ and make sure the [backend](../../backend/smart-wildlife-backend)'s `CORS_ORIGIN
 
 ## Auth & routing flow
 
-- `AuthContext` (`src/context/AuthContext.tsx`) holds `user`/`token` **in memory only** — not yet persisted to `AsyncStorage`, so the session is lost on app restart/reload.
+- `AuthContext` (`src/context/AuthContext.tsx`) holds `user`/`token` and stores validated user data plus token in `AsyncStorage` so a signed-in session can resume after app restart.
 - `src/app/index.tsx` redirects based on `user.role`:
   | Role | Redirects to |
   |---|---|
@@ -40,7 +61,7 @@ and make sure the [backend](../../backend/smart-wildlife-backend)'s `CORS_ORIGIN
 
 ## Status / known gaps
 
-The role areas exist under `src/app/`: `(auth)/login.tsx`, `community/` (home, multi-step `report/` flow, `reports/` list and detail, profile), `ranger/` (home, `conflicts/`, alerts, incident, **patrol — implemented, see below**, profile) and `liaison/` (home, `conflicts/`, alerts, responses, profile). The human–wildlife conflict flow (community report → ranger / liaison response) is the implemented feature; check each remaining tab screen before assuming it is more than a `RoleTabPage` outline.
+The role areas exist under `src/app/`: `(auth)/login.tsx`, `community/` (home, multi-step `report/` flow, `reports/` list and detail, profile), `ranger/` (home, `conflicts/`, alerts, incident, **patrol — implemented, see below**, profile) and `liaison/` (home, `conflicts/`, alerts, responses, profile). The human–wildlife conflict flow (community report → ranger / liaison response) is the implemented feature; the three home dashboards now load real summary metrics, and the Liaison Alerts and Responses screens load relevant backend data.
 
 ### Ranger "My Patrol" (`src/app/ranger/patrol.tsx`)
 

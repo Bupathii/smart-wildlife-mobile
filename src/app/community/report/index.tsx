@@ -110,7 +110,7 @@ export default function ConflictTypeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-50 dark:bg-[#081A17]">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -122,11 +122,11 @@ export default function ConflictTypeScreen() {
           false
         }
       >
-        <Text className="text-[26px] font-bold text-slate-900">
+        <Text className="text-[26px] font-bold text-slate-900 dark:text-[#F1F7F1]">
           What happened?
         </Text>
 
-        <Text className="mt-2 text-sm leading-6 text-slate-500">
+        <Text className="mt-2 text-sm leading-6 text-slate-500 dark:text-[#A3B9B0]">
           Select the type of
           human-wildlife conflict you
           want to report.
@@ -198,7 +198,7 @@ export default function ConflictTypeScreen() {
                         }
                       </Text>
 
-                      <Text className="mt-1 text-xs leading-5 text-slate-500">
+                      <Text className="mt-1 text-xs leading-5 text-slate-500 dark:text-[#A3B9B0]">
                         {
                           item.description
                         }
@@ -243,7 +243,7 @@ export default function ConflictTypeScreen() {
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4">
+      <View className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-5 pb-5 pt-4 dark:bg-[#102923] dark:border-[#28493D]">
         <Pressable
           disabled={
             !draft.conflictType

@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/theme/ThemeContext";
 import {
   Stack,
 } from "expo-router";
@@ -7,17 +8,18 @@ import {
 } from "@/context/ConflictReportContext";
 
 export default function ReportLayout() {
+  const { colors } = useAppTheme();
   return (
     <ConflictReportProvider>
       <Stack
         screenOptions={{
           headerStyle: {
             backgroundColor:
-              "#FFFFFF",
+              colors.surface,
           },
 
           headerTintColor:
-            "#0F172A",
+            colors.text,
 
           headerTitleStyle: {
             fontWeight: "700",
@@ -28,7 +30,7 @@ export default function ReportLayout() {
 
           contentStyle: {
             backgroundColor:
-              "#F8FAFC",
+              colors.background,
           },
         }}
       >

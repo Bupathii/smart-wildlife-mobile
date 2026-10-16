@@ -1,3 +1,4 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
 import {
   ActivityIndicator,
   Alert,
@@ -45,28 +46,29 @@ function statusStyle(status: string) {
 }
 
 function ReportCard({ report }: { report: PendingIncidentReport }) {
+  const themedStyles = useThemedStyles(styles);
   const ss = statusStyle(report.syncStatus);
   const dateStr = report.createdAt
     ? new Date(report.createdAt).toISOString().slice(0, 10)
     : "";
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={styles.cardLeft}>
-          <Text style={styles.cardTitle}>
+    <View style={themedStyles.card}>
+      <View style={themedStyles.cardTop}>
+        <View style={themedStyles.cardLeft}>
+          <Text style={themedStyles.cardTitle}>
             {INCIDENT_LABELS[report.incidentType] ?? report.incidentType}
           </Text>
-          <Text style={styles.cardDate}>{dateStr}</Text>
+          <Text style={themedStyles.cardDate}>{dateStr}</Text>
           {report.description ? (
-            <Text style={styles.cardDesc} numberOfLines={1}>
+            <Text style={themedStyles.cardDesc} numberOfLines={1}>
               {report.description}
             </Text>
           ) : null}
         </View>
-        <View style={[styles.badge, ss.badge]}>
-          <View style={[styles.dot, ss.dot]} />
-          <Text style={[styles.badgeText, ss.text]}>
+        <View style={[themedStyles.badge, ss.badge]}>
+          <View style={[themedStyles.dot, ss.dot]} />
+          <Text style={[themedStyles.badgeText, ss.text]}>
             {report.syncStatus === "Synchronized" ? "Synchronized" : "Pending"}
           </Text>
         </View>
@@ -76,6 +78,7 @@ function ReportCard({ report }: { report: PendingIncidentReport }) {
 }
 
 export default function MyIncidentsScreen() {
+  const themedStyles = useThemedStyles(styles);
   const { token } = useAuth();
   const [reports, setReports] = useState<PendingIncidentReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,23 +160,23 @@ export default function MyIncidentsScreen() {
   }, [loadReports]);
 
   return (
-    <View style={styles.root}>
-      <View style={[styles.circle, styles.circleTopLeft]} />
-      <View style={[styles.circle, styles.circleBottomRight]} />
+    <View style={themedStyles.root}>
+      <View style={[themedStyles.circle, themedStyles.circleTopLeft]} />
+      <View style={[themedStyles.circle, themedStyles.circleBottomRight]} />
 
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={themedStyles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#0F766E" />
         }
       >
-        <Text style={styles.pageTitle}>My Incident Reports</Text>
+        <Text style={themedStyles.pageTitle}>My Incident Reports</Text>
 
         {/* Sync button */}
         <Pressable
           style={({ pressed }) => [
-            styles.syncBtn,
+            themedStyles.syncBtn,
             pressed && { opacity: 0.8 },
           ]}
           onPress={handleSync}
@@ -184,7 +187,7 @@ export default function MyIncidentsScreen() {
           ) : (
             <RefreshCw size={18} color="#0F766E" strokeWidth={2} />
           )}
-          <Text style={styles.syncBtnText}>
+          <Text style={themedStyles.syncBtnText}>
             {syncing ? "Syncing..." : "Sync Pending Reports"}
           </Text>
         </Pressable>
@@ -197,9 +200,9 @@ export default function MyIncidentsScreen() {
             style={{ marginTop: 40 }}
           />
         ) : reports.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>No incident reports yet.</Text>
-            <Text style={styles.emptySubtext}>
+          <View style={themedStyles.empty}>
+            <Text style={themedStyles.emptyText}>No incident reports yet.</Text>
+            <Text style={themedStyles.emptySubtext}>
               Submit your first report from the Report Incident tab.
             </Text>
           </View>

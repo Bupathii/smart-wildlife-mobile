@@ -1,3 +1,5 @@
+import { useAppTheme } from "@/theme/ThemeContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   BellRing,
   ClipboardList,
@@ -17,11 +19,10 @@ import {
   useAuth,
 } from "@/context/AuthContext";
 
-const ACTIVE_COLOR = "#0F766E";
-const INACTIVE_COLOR = "#64748B";
 
 export default function RangerLayout() {
   const { user } = useAuth();
+  const { colors, dark } = useAppTheme();
 
   if (!user) {
     return (
@@ -39,10 +40,12 @@ export default function RangerLayout() {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: "#0F766E",
+          backgroundColor: colors.primaryStrong,
         },
 
         headerTintColor: "#FFFFFF",
+
+        headerRight: () => <ThemeToggle compact header />,
 
         headerTitleStyle: {
           fontWeight: "700",
@@ -50,17 +53,17 @@ export default function RangerLayout() {
         },
 
         tabBarActiveTintColor:
-          ACTIVE_COLOR,
+          colors.primary,
 
         tabBarInactiveTintColor:
-          INACTIVE_COLOR,
+          colors.muted,
 
         tabBarStyle: {
           height: 70,
           paddingTop: 6,
           paddingBottom: 8,
-          backgroundColor: "#FFFFFF",
-          borderTopColor: "#E2E8F0",
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
         },
 
@@ -278,4 +281,4 @@ export default function RangerLayout() {
       />
     </Tabs>
   );
-}
+}
