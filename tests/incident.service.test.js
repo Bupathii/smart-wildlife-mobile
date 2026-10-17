@@ -16,6 +16,21 @@ jest.mock(
   })
 );
 
+// ─── expo-file-system mock ────────────────────────────────────────────────────
+// Mirrors the real File class from expo-file-system used by appendEvidencePhotos.
+
+class MockFile {
+  constructor(uri) {
+    this.uri    = uri;
+    this.exists = uri ? true : false;
+  }
+}
+
+jest.mock(
+  'expo-file-system',
+  () => ({ File: MockFile })
+);
+
 // ─── AsyncStorage mock ────────────────────────────────────────────────────────
 
 const mockStorage = new Map();
@@ -115,6 +130,7 @@ const {
   updateIncidentStatus,
   getPendingIncidents,
   clearAllIncidents,
+  deleteIncident,
 } = require('@/services/incident.storage');
 
 // ─── incident.service — submitIncidentReport ──────────────────────────────────
@@ -179,16 +195,17 @@ describe(
           'tok'
         );
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+        // Body is FormData — inspect via .get(), not JSON.parse()
+        const form = mockFetch.mock.calls[0][1].body;
 
-        expect(body.clientIncidentId).toBe('inc_002');
-        expect(body.incidentType).toBe('Illegal Camp');
-        expect(body.description).toBe('Camp found');
-        expect(body.severity).toBe('MEDIUM');
-        expect(body.locationSource).toBe('MANUAL');
-        expect(body.latitude).toBe(7.0);
-        expect(body.longitude).toBe(81.0);
-        expect(body.locationTimestamp).toBe('2026-10-08T10:00:00.000Z');
+        expect(form.get('clientIncidentId')).toBe('inc_002');
+        expect(form.get('incidentType')).toBe('Illegal Camp');
+        expect(form.get('description')).toBe('Camp found');
+        expect(form.get('severity')).toBe('MEDIUM');
+        expect(form.get('locationSource')).toBe('MANUAL');
+        expect(form.get('latitude')).toBe('7');
+        expect(form.get('longitude')).toBe('81');
+        expect(form.get('locationTimestamp')).toBe('2026-10-08T10:00:00.000Z');
       }
     );
 
@@ -212,9 +229,66 @@ describe(
           'tok'
         );
 
-        const body = JSON.parse(mockFetch.mock.calls[0][1].body);
-        // locationTimestamp omitted from payload — should be undefined in JSON
-        expect(body.locationTimestamp).toBeUndefined();
+        // locationTimestamp was not in the payload — the form field must be absent
+        const form = mockFetch.mock.calls[0][1].body;
+        expect(form.get('locationTimestamp')).toBeUndefined();
+      }
+    );
+
+    test(
+      'appends evidence files to FormData when evidenceUris provided',
+      async () => {
+        mockFetch.mockResolvedValue(
+          makeResponse({ data: { report: { _id: 'srv-004' } } })
+        );
+
+        await submitIncidentReport(
+          {
+            clientIncidentId: 'inc_004',
+            incidentType: 'Poaching',
+            description: 'With photo',
+            severity: 'HIGH',
+            locationSource: 'GPS',
+            latitude: 6.0,
+            longitude: 80.0,
+            evidenceUris: ['file:///data/photo1.jpg', 'file:///data/photo2.jpg'],
+          },
+          'tok'
+        );
+
+        const form = mockFetch.mock.calls[0][1].body;
+        const evidenceFiles = form.getAll('evidence');
+
+        expect(evidenceFiles).toHaveLength(2);
+        // Each entry is a MockFile instance with the original URI
+        expect(evidenceFiles[0].uri).toBe('file:///data/photo1.jpg');
+        expect(evidenceFiles[1].uri).toBe('file:///data/photo2.jpg');
+      }
+    );
+
+    test(
+      'does not append evidence field when evidenceUris is empty',
+      async () => {
+        mockFetch.mockResolvedValue(
+          makeResponse({ data: { report: { _id: 'srv-005' } } })
+        );
+
+        await submitIncidentReport(
+          {
+            clientIncidentId: 'inc_005',
+            incidentType: 'Poaching',
+            description: 'No photo',
+            severity: 'MEDIUM',
+            locationSource: 'GPS',
+            latitude: 6.0,
+            longitude: 80.0,
+            evidenceUris: [],
+          },
+          'tok'
+        );
+
+        const form = mockFetch.mock.calls[0][1].body;
+        expect(form.getAll('evidence')).toHaveLength(0);
       }
     );
 
@@ -502,6 +576,45 @@ describe(
 
         const all = await getAllIncidents();
         expect(all).toEqual([]);
+      }
+    );
+
+    test(
+      'deleteIncident removes the matching report from storage',
+      async () => {
+        await saveIncident(makeIncident({ clientIncidentId: 'to-delete' }));
+        await saveIncident(makeIncident({ clientIncidentId: 'to-keep' }));
+
+        await deleteIncident('to-delete');
+
+        const all = await getAllIncidents();
+        expect(all).toHaveLength(1);
+        expect(all[0].clientIncidentId).toBe('to-keep');
+      }
+    );
+
+    test(
+      'deleteIncident is a no-op for an unknown clientIncidentId',
+      async () => {
+        await saveIncident(makeIncident());
+        await deleteIncident('nonexistent-id');
+
+        const all = await getAllIncidents();
+        expect(all).toHaveLength(1);
+      }
+    );
+
+    test(
+      'deleteIncident works for Synchronized reports',
+      async () => {
+        await saveIncident(
+          makeIncident({ clientIncidentId: 'synced', syncStatus: 'Synchronized' })
+        );
+
+        await deleteIncident('synced');
+
+        const all = await getAllIncidents();
+        expect(all).toHaveLength(0);
       }
     );
   }
