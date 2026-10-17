@@ -62,7 +62,9 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --runInBand",
-    "test:coverage": "jest --runInBand --coverage"
+    "test:coverage": "jest --runInBand --coverage",
+    "test:patrol": "jest --runInBand tests/patrol",
+    "test:coverage:patrol": "jest --runInBand --coverage --coverageReporters=text --collectCoverageFrom=src/services/patrol.service.ts --collectCoverageFrom=src/app/ranger/patrol.tsx tests/patrol"
   },
   "lightningcss": "1.30.1",
   "private": true
